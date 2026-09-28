@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/covalt-design-system-013b27b1-bdaa-4f23-aa8b-cefdfb247664/tokens.css">
+<script src="_ds/covalt-design-system-013b27b1-bdaa-4f23-aa8b-cefdfb247664/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+html{scroll-behavior:smooth}body{margin:0;background:#F5F7F5}
+a{color:inherit;text-decoration:none}a:hover{color:#24826B}
+@keyframes cvFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes cvPulseV{0%{top:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes cvPulseH{0%{left:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
+@keyframes cvDash{to{stroke-dashoffset:-24}}
+@keyframes cvRing{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.7);opacity:0}}
+@keyframes cvType{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes cvMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes cvBlink{0%,100%{opacity:1}50%{opacity:.25}}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="font-family:var(--font-text);color:var(--color-ink);background:var(--color-bone);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden">
+
+<header style="position:sticky;top:0;z-index:50;background:rgba(245,247,245,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--color-polar-blue)">
+  <div style="padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <a href="#top" onClick="{{ closeMenu }}" style="display:flex;align-items:center;flex:none"><img src="assets/covalt-wordmark.svg" alt="Covalt" style="height:18px;display:block"></a>
+    <div style="display:flex;gap:8px;align-items:center">
+      <a href="#contact" style="display:inline-flex;align-items:center;height:36px;padding:0 14px;background:var(--color-ink);color:#fff;border-radius:4px;font-size:13px;font-weight:500;white-space:nowrap" style-hover="background:#24826B;color:#fff">Proposition</a>
+      <button onClick="{{ toggleMenu }}" aria-label="Menu" style="width:44px;height:44px;display:grid;place-items:center;background:none;border:0;cursor:pointer;color:var(--color-ink);padding:0">
+        <sc-if value="{{ menuClosed }}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></sc-if>
+        <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></sc-if>
+      </button>
+    </div>
+  </div>
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:60px;height:calc(100vh - 60px);background:var(--color-bone);padding:12px 20px 32px;display:flex;flex-direction:column;overflow:auto">
+      <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;color:var(--text-tertiary);padding:16px 0 4px">NOS OFFRES</span>
+      <a href="#offres-detail" onClick="{{ mtab0 }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Loan Connect<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <a href="#offres-detail" onClick="{{ mtab1 }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Loan Protection<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <a href="#offres-detail" onClick="{{ mtab2 }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Loan Servicing<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;color:var(--text-tertiary);padding:28px 0 4px">COVALT</span>
+      <a href="#technologie" onClick="{{ closeMenu }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Technologie<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <a href="#chiffres" onClick="{{ closeMenu }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Expertise<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <a href="#structuro" onClick="{{ closeMenu }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Structuro<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <a href="#temoignages" onClick="{{ closeMenu }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--color-polar-blue);font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">Cas clients<span style="font-size:16px;color:var(--color-green-500)">→</span></a>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:32px">
+        <a href="#contact" onClick="{{ closeMenu }}" style="display:flex;justify-content:center;align-items:center;height:48px;background:var(--color-green-500);color:#fff;border-radius:4px;font-size:15px;font-weight:500">Obtenir une proposition</a>
+        <a href="#" style="display:flex;justify-content:center;align-items:center;height:48px;border:1px solid rgba(8,20,18,0.2);border-radius:4px;font-size:15px;font-weight:500">Connexion</a>
+      </div>
+    </div>
+  </sc-if>
+</header>
+
+<section id="top" data-screen-label="01 Hero" style="position:relative;overflow:hidden;border-bottom:1px solid var(--color-polar-blue)">
+  <img src="assets/frame-engraving-banner.png" alt="" style="position:absolute;right:-30%;top:0;height:420px;width:110%;object-fit:cover;object-position:right top;opacity:0.35;mix-blend-mode:multiply;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 45%);mask-image:linear-gradient(90deg,transparent 0%,#000 45%)">
+  <div style="position:relative;max-width:1280px;margin:0 auto;padding:56px 20px 64px">
+    
+    <h1 data-reveal="1" data-reveal-delay="80" style="font-family:var(--font-display);font-weight:400;font-size:40px;line-height:1.05;letter-spacing:-0.025em;margin:0;max-width:14ch;color:var(--color-ink)">Le partenaire des prêteurs<br>pour {{ rotator }}<br>leurs financements.</h1>
+    <p data-reveal="1" data-reveal-delay="180" style="margin:24px 0 0;font-size:17px;line-height:1.55;color:var(--text-secondary);max-width:56ch;text-wrap:pretty">Covalt réunit technologie et expertise pour vous accompagner sur toute la chaîne de gestion de vos financements.</p>
+    <div data-reveal="1" data-reveal-delay="260" style="display:flex;flex-direction:column;gap:10px;margin-top:32px">
+      <a href="#contact" style="display:flex;justify-content:center;align-items:center;gap:10px;height:52px;padding:0 22px;background:var(--color-green-500);color:#fff;border-radius:4px;font-size:15px;font-weight:500" style-hover="background:#1E6E5A;color:#fff">Obtenir une proposition sur-mesure <span style="font-size:16px">→</span></a>
+      <a href="#offres-detail" style="display:flex;justify-content:center;align-items:center;height:52px;padding:0 22px;border:1px solid rgba(8,20,18,0.2);color:var(--color-ink);border-radius:4px;font-size:15px;font-weight:500;background:rgba(255,255,255,0.5)" style-hover="border-color:#081412;color:#081412">Découvrir nos offres</a>
+    </div>
+
+  </div>
+</section><section id="clients" data-screen-label="02 Clients" style="border-bottom: 1px solid var(--color-polar-blue)">
+  <div style="padding:28px 0;display:flex;flex-direction:column;align-items:stretch;gap:18px">
+    <span style="padding:0 20px;font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-secondary)">Ils nous font confiance</span>
+    <div onMouseEnter="{{ mqPause }}" onMouseLeave="{{ mqPlay }}" style="flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)">
+      <div style="display:flex;width:max-content;animation:cvMarquee 32s linear infinite;animation-play-state:{{ mqState }}"><div style="display:flex;align-items:center;gap:44px;padding-right:44px;flex:none"><img src="assets/clients/raizers.png" alt="Raizers" style="height:30px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/tylia.png" alt="Tylia Invest" style="height:36px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/mcapital.png" alt="M Capital" style="height:16px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/arkea.png" alt="Arkéa Crédit Bail" style="height:24px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/o2capital.png" alt="O2 Capital" style="height:44px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/sanso.png" alt="Sanso IS" style="height:26px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/eurazeo.png" alt="Eurazeo" style="height:22px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/bpce-lease.png" alt="BPCE Lease" style="height:30px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/interinvest.png" alt="Inter Invest" style="height:22px;width:auto;display:block;opacity:0.72;flex:none"></div><div aria-hidden="true" style="display:flex;align-items:center;gap:44px;padding-right:44px;flex:none"><img src="assets/clients/raizers.png" alt="" style="height:30px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/tylia.png" alt="" style="height:36px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/mcapital.png" alt="" style="height:16px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/arkea.png" alt="" style="height:24px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/o2capital.png" alt="" style="height:44px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/sanso.png" alt="" style="height:26px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/eurazeo.png" alt="" style="height:22px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/bpce-lease.png" alt="" style="height:30px;width:auto;display:block;opacity:0.72;flex:none"><img src="assets/clients/interinvest.png" alt="" style="height:22px;width:auto;display:block;opacity:0.72;flex:none"></div></div>
+    </div>
+  </div>
+</section><section id="offres-detail" data-screen-label="02 Offres" style="background:var(--color-bone);border-bottom:1px solid var(--color-polar-blue);scroll-margin-top:72px">
+  <div data-reveal="1" onMouseEnter="{{ pause }}" onMouseLeave="{{ resume }}" style="max-width:1280px;margin:0 auto;padding:64px 20px 72px;display:flex;flex-direction:column;gap:32px">
+    <sc-if value="{{ sectionTabs }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:48px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:end">
+          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Trois offres, un seul partenaire sur toute la vie du financement.</h2>
+          <p style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:0;max-width:52ch">Covalt vous accompagne sur toute le cycle de vie de vos financements.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr">
+          <button onClick="{{ tclick0 }}" style="position:relative;text-align:left;background:none;border:0;padding:14px 0 16px;border-top:1px solid var(--color-polar-blue);cursor:pointer;display:flex;flex-direction:column;gap:8px;font:inherit;color:var(--color-ink);transition:opacity 400ms">
+            <span style="position:absolute;left:0;right:0;top:-1px;height:2px;overflow:hidden">{{ tfill0 }}</span>
+            <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:{{ tc0 }};transition:color 500ms">01 — Sourcer</span>
+            <img src="assets/offers/loan-connect.png" alt="Loan Connect" style="height:20px;width:auto;display:block;align-self:flex-start;margin:0px 0 0;filter:{{ tf0 }};opacity:{{ tlo0 }};transition:filter 500ms,opacity 500ms">
+            <span style="font-size:13px;line-height:1.45;color:var(--text-secondary);max-width:34ch">Origination de nouveaux financements</span>
+          </button>
+          <button onClick="{{ tclick1 }}" style="position:relative;text-align:left;background:none;border:0;padding:14px 0 16px;border-top:1px solid var(--color-polar-blue);cursor:pointer;display:flex;flex-direction:column;gap:8px;font:inherit;color:var(--color-ink);transition:opacity 400ms">
+            <span style="position:absolute;left:0;right:0;top:-1px;height:2px;overflow:hidden">{{ tfill1 }}</span>
+            <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:{{ tc1 }};transition:color 500ms">02 — Sécuriser</span>
+            <img src="assets/offers/loan-protection.png" alt="Loan Protection" style="height:31px;width:auto;display:block;align-self:flex-start;margin:-11px 0 0;filter:{{ tf1 }};opacity:{{ tlo1 }};transition:filter 500ms,opacity 500ms">
+            <span style="font-size:13px;line-height:1.45;color:var(--text-secondary);max-width:34ch">Sécurisation par fiducie et agency</span>
+          </button>
+          <button onClick="{{ tclick2 }}" style="position:relative;text-align:left;background:none;border:0;padding:14px 0 16px;border-top:1px solid var(--color-polar-blue);cursor:pointer;display:flex;flex-direction:column;gap:8px;font:inherit;color:var(--color-ink);transition:opacity 400ms">
+            <span style="position:absolute;left:0;right:0;top:-1px;height:2px;overflow:hidden">{{ tfill2 }}</span>
+            <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:{{ tc2 }};transition:color 500ms">03 — Administrer</span>
+            <img src="assets/offers/loan-servicing.png" alt="Loan Servicing" style="height:20px;width:auto;display:block;align-self:flex-start;margin:0px 0 0;filter:{{ tf2 }};opacity:{{ tlo2 }};transition:filter 500ms,opacity 500ms">
+            <span style="font-size:13px;line-height:1.45;color:var(--text-secondary);max-width:34ch">Services tiers associés au financement</span>
+          </button>
+        </div>
+      </div>
+    </sc-if>
+    <div ref="{{ panelRef }}" style="min-height:{{ panelMin }}px;display:flex;flex-direction:column;justify-content:flex-start">
+      <sc-if value="{{ isT0 }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:40px;align-items:center">
+      <div data-panel-anim="1" style="display:flex;flex-direction:column;gap:26px">
+        <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#007AA3">01 — Loan Connect · Origination</div>
+        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Développez votre portefeuille avec des dossiers pré-qualifiés.</h2>
+        <p style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:0;max-width:52ch">Recevez des opportunités sélectionnées parmi plus de 800 M€ de financements mis en ligne, avec un Security Package proposé en amont par nos équipes.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--color-polar-blue);border:1px solid var(--color-polar-blue);margin-top:8px">
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">01</span><span style="font-size:14px;font-weight:500;line-height:1.35">Dossiers pré-sélectionnés selon vos critères</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">02</span><span style="font-size:14px;font-weight:500;line-height:1.35">Security Package proposé en amont</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">03</span><span style="font-size:14px;font-weight:500;line-height:1.35">Analyse crédit et documentation prêtes</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">04</span><span style="font-size:14px;font-weight:500;line-height:1.35">Mise en relation avec l'emprunteur</span></div>
+        </div>
+        <div><a href="#contact" style="display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;background:var(--color-ink);color:#fff;border-radius:4px;font-size:14px;font-weight:500" style-hover="background:#24826B;color:#fff">Découvrir Loan Connect →</a></div>
+      </div>
+      <div data-panel-anim="1" style="position:relative;padding:20px 0 20px 20px;margin-right:-20px">
+        <div style="position:absolute;inset:0;background:#007AA3"></div>
+        <div onMouseEnter="{{ cxTouch }}" style="position:relative;background:var(--color-white);box-shadow:var(--shadow-4);margin-right:0;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--color-polar-blue)">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-display);font-size:17px">Dossiers pré-qualifiés</span><span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary)">Sélection pour votre profil de risque</span></div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">210 opérations</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:10px;padding:10px 14px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);background:var(--color-bone)"><span>Opération</span><span>Montant · Sûreté</span></div>
+          <sc-for list="{{ deals }}" as="d" hint-placeholder-count="5">
+            <div onClick="{{ d.onClick }}" style="display:grid;grid-template-columns:1.3fr 1fr;gap:4px 10px;padding:12px 14px;font-size:13px;align-items:center;border-top:1px solid var(--color-polar-blue);background:{{ d.bg }};box-shadow:{{ d.ring }};cursor:pointer;transition:background 300ms,box-shadow 300ms" style-hover="background:#E8F3F7">
+              <span style="display:flex;flex-direction:column"><span style="font-weight:500;display:flex;gap:8px;align-items:center">{{ d.name }}<span style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.08em;color:#007AA3;opacity:{{ d.newOp }};transition:opacity 500ms">NOUVEAU</span></span><span style="font-size:11px;color:var(--text-tertiary)">{{ d.obj }}</span></span>
+              <span style="display:flex;flex-direction:column;gap:4px;align-items:flex-start"><span style="font-family:var(--font-mono);font-size:12px">{{ d.amount }}</span><span style="padding:2px 8px;border-radius:999px;background:#EEF6F9;border:1px solid #B8D8E6;font-size:11px;color:#005A78;white-space:nowrap">{{ d.sec }}</span></span>
+            </div>
+          </sc-for>
+          <div style="position:absolute;inset:0;background:rgba(8,20,18,0.32);display:flex;align-items:center;justify-content:center;padding:14px;opacity:{{ popOp }};pointer-events:{{ popPe }};transition:opacity 350ms cubic-bezier(0.2,0,0,1)">
+            <div style="width:100%;max-width:360px;background:var(--color-white);box-shadow:var(--shadow-4);transform:translateY({{ popY }}px) scale({{ popS }});transition:transform 450ms cubic-bezier(0.3,0,0,1)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--color-polar-blue)">
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-display);font-size:19px">{{ pop.name }}</span><span style="font-size:12px;color:var(--text-tertiary)">{{ pop.obj }}</span></div>
+                <button onClick="{{ popClose }}" aria-label="Fermer" style="width:28px;height:28px;display:grid;place-items:center;background:none;border:0;cursor:pointer;color:var(--text-secondary);padding:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;font-size:13px">
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Montant</span><span style="font-family:var(--font-mono)">{{ pop.amount }}</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Durée</span><span style="font-family:var(--font-mono)">{{ pop.dur }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">Security Package</span><span style="padding:2px 8px;border-radius:999px;background:#EEF6F9;border:1px solid #B8D8E6;font-size:11px;color:#005A78">{{ pop.sec }}</span></div>
+              </div>
+              <div style="padding:0 20px 20px">
+                <sc-if value="{{ notRequested }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ popRequest }}" style="width:100%;height:44px;background:#007AA3;color:#fff;border:0;border-radius:4px;font:inherit;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#005A78">Demander une mise en relation</button>
+                </sc-if>
+                <sc-if value="{{ requested }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:10px;align-items:center;padding:12px 14px;background:#EEF6F9;border:1px solid #B8D8E6;font-size:13px;color:#005A78"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 6 9 17l-5-5"></path></svg>Demande transmise à l'équipe Covalt.</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      </sc-if>
+      <sc-if value="{{ isT1 }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:40px;align-items:center">
+      <div data-panel-anim="1" style="display:flex;flex-direction:column;gap:26px">
+        <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-green-500)">02 — Loan Protection · Fiducie &amp; Agency</div>
+        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Déléguez la sécurisation de vos financements. Externalisez le risque.</h2>
+        <p style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:0;max-width:52ch">En qualité de fiduciaire ou d'agent des sûretés, Covalt porte et suit vos garanties pour votre compte. La plateforme détecte les signaux faibles ; nos experts les analysent et agissent.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--color-polar-blue);border:1px solid var(--color-polar-blue);margin-top:8px">
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">01</span><span style="font-size:14px;font-weight:500;line-height:1.35">Structuration et suivi des sûretés</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">02</span><span style="font-size:14px;font-weight:500;line-height:1.35">Suivi des emprunteurs en temps réel</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">03</span><span style="font-size:14px;font-weight:500;line-height:1.35">Alerte et analyse par un expert dédié</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">04</span><span style="font-size:14px;font-weight:500;line-height:1.35">Réalisation des sûretés en cas de défaut</span></div>
+        </div>
+        <div><a href="#contact" style="display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;background:var(--color-ink);color:#fff;border-radius:4px;font-size:14px;font-weight:500" style-hover="background:#24826B;color:#fff">Découvrir Loan Protection →</a></div>
+      </div>
+      <div data-panel-anim="1" style="position:relative;padding:20px 0 20px 20px;margin-right:-20px">
+        <div style="position:absolute;inset:0;background:#24826B"></div>
+        <div style="position:relative;background:var(--color-white);box-shadow:var(--shadow-4);margin-right:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--color-polar-blue)">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-display);font-size:17px">Opération Invest</span><span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary)">Compte séquestre N°00090192183</span></div>
+            <span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--color-green-100);color:var(--color-green-600);font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;animation:cvBlink 1.6s infinite"></span>Surveillance active</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--color-polar-blue)">
+            <div style="padding:14px;border-right:1px solid var(--color-polar-blue);display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary)">Solde en temps réel</span><span style="font-family:var(--font-display);font-size:20px;letter-spacing:-0.02em;font-feature-settings:'tnum' 1">{{ balanceStr }}</span></div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary)">Seuil d'alerte</span><span style="font-family:var(--font-display);font-size:20px;letter-spacing:-0.02em;color:var(--text-secondary)">150 000 €</span></div>
+          </div>
+          <sc-for list="{{ txs }}" as="t" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:70px 1fr auto;gap:0 10px;padding:11px 14px;border-top:1px solid var(--color-polar-blue);font-size:13px;align-items:center;background:{{ t.bg }};transition:background 900ms">
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">{{ t.date }}</span>
+              <span style="display:flex;flex-direction:column"><span>{{ t.label }}</span><span style="font-size:11px;color:var(--text-tertiary)">{{ t.cat }}</span></span>
+              <span style="font-family:var(--font-mono);font-size:13px;color:{{ t.color }}">{{ t.amount }}</span>
+            </div>
+          </sc-for>
+          
+        </div>
+        <div style="position:relative;margin:-24px 0 0 -8px;background:var(--color-ink);color:#fff;box-shadow:var(--shadow-4);opacity:{{ alertOp }};transform:translateY({{ alertY }}px);transition:opacity 500ms cubic-bezier(0.2,0,0,1),transform 600ms cubic-bezier(0.3,0,0,1)">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0FEB3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+            <span style="font-size:12px;color:rgba(255,255,255,0.72);flex:1">Bris de covenant détecté</span>
+            <span style="font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,0.5)">14:02</span>
+          </div>
+          <div style="display:flex;gap:12px;padding:16px;align-items:flex-start;opacity:{{ humanOp }};transition:opacity 500ms">
+            <image-slot id="consultant-photo" shape="circle" placeholder="Photo" style="width:44px;height:44px;flex:none"></image-slot>
+            <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="display:flex;flex-direction:column;font-size:14px;font-weight:500">Arthur Bertin <span style="font-weight:400;font-size:12px;color:rgba(255,255,255,0.55)">Chargé de sûretés</span></span><span style="font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,0.5)">14:09</span></div>
+              <sc-if value="{{ typing }}" hint-placeholder-val="{{ false }}">
+                <span style="display:flex;gap:4px;padding:6px 0">{{ dots }}</span>
+              </sc-if>
+              <sc-if value="{{ written }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size:13px;line-height:1.5;color:rgba(255,255,255,0.86)">Un retrait de 60 000 € a été détecté, correspondant à un bris de covenant de la documentation de financement. L'opération inclut une fiducie sur bien immobilier. Que souhaitez-vous faire ?</span>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+                  <a href="#" style="display:flex;justify-content:center;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:4px;font-size:13px;font-weight:500;background:var(--color-light-green);color:var(--color-ink)" style-hover="background:#fff;color:#081412">Demander l'activation de la sûreté</a>
+                  <a href="#" style="display:flex;justify-content:center;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:4px;font-size:13px;font-weight:500;border:1px solid rgba(255,255,255,0.3);color:#fff" style-hover="border-color:#fff;color:#fff">Échanger avec l'emprunteur</a>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      </sc-if>
+      <sc-if value="{{ isT2 }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:40px;align-items:center">
+      <div data-panel-anim="1" style="display:flex;flex-direction:column;gap:26px">
+        <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B4F">03 — Loan Servicing · Administration</div>
+        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Déchargez vos équipes du suivi administratif.</h2>
+        <p style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:0;max-width:52ch">Représentation de la masse, gestion extinctive, collecte des reportings : nos experts administrent vos opérations pour votre compte, jusqu'au remboursement final.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--color-polar-blue);border:1px solid var(--color-polar-blue);margin-top:8px">
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">01</span><span style="font-size:14px;font-weight:500;line-height:1.35">Représentation de la masse (RMO)</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">02</span><span style="font-size:14px;font-weight:500;line-height:1.35">Gestion extinctive (GEX)</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">03</span><span style="font-size:14px;font-weight:500;line-height:1.35">Collecte et contrôle des reportings</span></div>
+          <div style="background:var(--color-white);padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--color-green-500)">04</span><span style="font-size:14px;font-weight:500;line-height:1.35">Instruction des waivers et avenants</span></div>
+        </div>
+        <div><a href="#contact" style="display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;background:var(--color-ink);color:#fff;border-radius:4px;font-size:14px;font-weight:500" style-hover="background:#24826B;color:#fff">Découvrir Loan Servicing →</a></div>
+      </div>
+      <div data-panel-anim="1" style="position:relative;padding:20px 0 20px 20px;margin-right:-20px">
+        <div style="position:absolute;inset:0;background:#8A8A6A"></div>
+        <div style="position:relative;background:var(--color-white);box-shadow:var(--shadow-4);margin-right:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--color-polar-blue)">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-display);font-size:17px">Administration déléguée</span><span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary)">Octobre 2026 · 4 opérations</span></div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">{{ doneStr }}</span>
+          </div>
+          <sc-for list="{{ tasks }}" as="k" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:16px 1fr auto;gap:10px;padding:12px 14px;align-items:center;font-size:13px;border-top:1px solid var(--color-polar-blue);background:{{ k.bg }};transition:background 700ms">
+              <span style="width:14px;height:14px;border:1px solid {{ k.ring }};background:{{ k.dot }};border-radius:50%;transition:background 500ms,border-color 500ms"></span>
+              <span style="display:flex;flex-direction:column"><span style="font-weight:500">{{ k.title }}</span><span style="font-size:11px;color:var(--text-tertiary)">{{ k.sub }}</span></span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:{{ k.stColor }}">{{ k.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+      </sc-if>
+    </div>
+  </div>
+</section>
+
+<section id="chiffres" data-screen-label="03 Chiffres" ref="{{ statsRef }}" style="background:var(--color-white);border-bottom:1px solid var(--color-polar-blue)">
+  <div style="max-width:1280px;margin:0 auto;padding:72px 20px;display:flex;flex-direction:column;gap:64px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:end">
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:24px"><div style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-green-500)">Expertise opérationnelle</div><h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Une expertise éprouvée, des centaines d'opérations sécurisées.</h2></div>
+      <p data-reveal="1" style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:0;max-width:52ch">Juristes, gestionnaires et analystes crédit travaillent aux côtés des prêteurs, adossés à une technologie développée en interne.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 16px">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+        <div data-reveal="1" style="display:flex;flex-direction:column;gap:12px;border-left:1px solid var(--color-polar-blue);padding-left:14px">
+          <div style="font-family:var(--font-display);font-size:40px;line-height:1;letter-spacing:-0.025em;font-feature-settings:'tnum' 1">{{ s.pre }}{{ s.shown }}<span style="font-size:20px;color:var(--color-green-500);margin-left:4px">{{ s.unit }}</span></div>
+          <div style="font-size:14px;line-height:1.5;color:var(--text-secondary);max-width:26ch">{{ s.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="technologie" data-screen-label="05 Technologie" style="background:var(--color-ink);color:#fff">
+  <div style="max-width:1280px;margin:0 auto;padding:72px 20px;display:flex;flex-direction:column;gap:48px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div data-reveal="1" style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-light-green)">La technologie Covalt</div>
+        <h2 data-reveal="1" style="font-family:var(--font-display);font-weight:400;font-size:clamp(36px,4vw,54px);line-height:1.06;letter-spacing:-0.02em;margin:0;color:#fff;text-wrap:balance">Une plateforme propriétaire qui renforce chacune de nos offres.</h2>
+      </div>
+      <p data-reveal="1" style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.72);margin:0;max-width:50ch">Développée en interne, la plateforme Covalt équipe nos équipes et vous donne un accès en lecture à vos opérations. Elle n'est pas un produit de plus : c'est ce qui rend nos services plus rapides, plus fiables et plus transparents.</p>
+    </div>
+
+    <div data-reveal="1" style="display:flex;flex-direction:column">
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+        <div style="border:1px solid rgba(255,255,255,0.14);padding:12px;display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-mono);font-size:10px;color:var(--color-light-green)">01</span><span style="font-family:var(--font-display);font-size:15px;line-height:1.15">Loan Connect</span></div>
+        <div style="border:1px solid rgba(255,255,255,0.14);padding:12px;display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-mono);font-size:10px;color:var(--color-light-green)">02</span><span style="font-family:var(--font-display);font-size:15px;line-height:1.15">Loan Protection</span></div>
+        <div style="border:1px solid rgba(255,255,255,0.14);padding:12px;display:flex;flex-direction:column;gap:4px"><span style="font-family:var(--font-mono);font-size:10px;color:var(--color-light-green)">03</span><span style="font-family:var(--font-display);font-size:15px;line-height:1.15">Loan Servicing</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;height:48px">
+        <div style="position:relative;justify-self:center;width:1px;background:rgba(255,255,255,0.18)">{{ pulseV0 }}</div>
+        <div style="position:relative;justify-self:center;width:1px;background:rgba(255,255,255,0.18)">{{ pulseV1 }}</div>
+        <div style="position:relative;justify-self:center;width:1px;background:rgba(255,255,255,0.18)">{{ pulseV2 }}</div>
+      </div>
+      <div style="position:relative;background:var(--color-green-500);padding:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;overflow:hidden">
+        <div style="position:absolute;left:0;right:0;top:0;height:1px;background:rgba(255,255,255,0.25)">{{ pulseH }}</div>
+        <span style="font-family:var(--font-display);font-size:26px;letter-spacing:-0.01em">Plateforme Covalt</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="padding:6px 12px;border:1px solid rgba(255,255,255,0.35);border-radius:999px;font-size:12px">Connexion bancaire</span>
+          <span style="padding:6px 12px;border:1px solid rgba(255,255,255,0.35);border-radius:999px;font-size:12px">Signaux faibles</span>
+          <span style="padding:6px 12px;border:1px solid rgba(255,255,255,0.35);border-radius:999px;font-size:12px">Alertes métier</span>
+          <span style="padding:6px 12px;border:1px solid rgba(255,255,255,0.35);border-radius:999px;font-size:12px">Espace collaboratif</span>
+          <span style="padding:6px 12px;border:1px solid rgba(255,255,255,0.35);border-radius:999px;font-size:12px">Piste d'audit</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr;gap:28px;border-top:1px solid rgba(255,255,255,0.12);padding-top:32px">
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:12px"><span style="font-size:16px;font-weight:500">Détection en temps réel</span><span style="font-size:14px;line-height:1.55;color:rgba(255,255,255,0.66)">Comptes bancaires, événements juridiques et financiers de l'emprunteur analysés en continu.</span></div>
+      <div data-reveal="1" data-reveal-delay="80" style="display:flex;flex-direction:column;gap:12px"><span style="font-size:16px;font-weight:500">Transparence totale</span><span style="font-size:14px;line-height:1.55;color:rgba(255,255,255,0.66)">Un accès en lecture à la plateforme de monitoring pour suivre vos opérations à tout moment.</span></div>
+      <div data-reveal="1" data-reveal-delay="160" style="display:flex;flex-direction:column;gap:12px"><span style="font-size:16px;font-weight:500">Action immédiate</span><span style="font-size:14px;line-height:1.55;color:rgba(255,255,255,0.66)">Alerte en cas d'incident, accompagnée d'une proposition d'action par nos experts.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="structuro" data-screen-label="05 Structuro" style="background:var(--color-bone);border-bottom:1px solid var(--color-polar-blue)">
+  <div style="max-width:1280px;margin:0 auto;padding:72px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:40px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:28px;align-items:flex-start">
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="#081412" style="flex:none"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg>
+          <span style="font-family:var(--font-display);font-weight:700;font-size:34px;line-height:1;letter-spacing:-0.02em">Structuro</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding-left:42px;font-size:12px;color:var(--text-secondary)">by <img src="assets/covalt-wordmark.svg" alt="Covalt" style="height:11px;display:block"></div>
+      </div>
+      <div data-reveal="1" style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:8px;padding:5px 10px;background:var(--color-light-green);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.08em"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-green-500)"></span>GRATUIT</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--color-green-200);background:var(--color-white);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--color-green-700)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>PROPULSÉ PAR L'IA</span>
+      </div>
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:18px">
+        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Vous ne savez pas par où commencer ?</h2>
+        <p style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:0;max-width:52ch">Structuro analyse votre opération et vous recommande en quelques minutes la structure de sécurisation la plus adaptée — niveau de protection et coût inclus — avant même que le dossier ne soit lancé.</p>
+      </div>
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:14px">
+        <div><a href="#" style="display:flex;justify-content:center;align-items:center;gap:10px;height:52px;padding:0 22px;background:var(--color-green-500);color:#fff;border-radius:4px;font-size:15px;font-weight:500" style-hover="background:#1E6E5A;color:#fff">Essayer Structuro gratuitement →</a></div>
+        <span style="font-size:12px;line-height:1.5;color:var(--text-tertiary);max-width:52ch">Les recommandations de Structuro sont fournies à titre indicatif et ne constituent pas un conseil financier ou juridique.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:stretch">
+      <div data-reveal="1" style="background:var(--color-white);border:1px solid var(--color-polar-blue);box-shadow:var(--shadow-2);padding:18px 20px;display:flex;flex-direction:column;gap:12px;font-size:12px">
+        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-tertiary)">VOTRE OPÉRATION</span>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--text-secondary)">Montant</span><span style="font-weight:600">1 M€</span></div><div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--text-secondary)">Durée</span><span style="font-weight:600">36 mois</span></div><div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--text-secondary)">Actif</span><span style="font-weight:600">Bureaux</span></div><div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--text-secondary)">Type</span><span style="font-weight:600">Immobilier</span></div>
+      </div>
+      <svg data-reveal="1" data-reveal-delay="200" width="2" height="36" viewBox="0 0 2 36" preserveAspectRatio="none" style="display:block;align-self:center;overflow:visible"><line x1="1" y1="0" x2="1" y2="36" stroke="#24826B" stroke-width="1.5" stroke-dasharray="8 4" fill="none" vector-effect="non-scaling-stroke" style="animation:cvDash 1.2s linear infinite"></line></svg>
+      <div data-reveal="1" data-reveal-delay="300" style="display:flex;flex-direction:column;align-items:center;gap:10px">
+        <div style="position:relative;width:76px;height:76px">
+          <span style="position:absolute;inset:0;border-radius:50%;border:1px solid var(--color-green-500);animation:cvRing 2.4s cubic-bezier(0.2,0,0,1) infinite"></span>
+          <span style="position:absolute;inset:0;border-radius:50%;background:var(--color-white);border:1px solid var(--color-polar-blue);box-shadow:var(--shadow-2);display:grid;place-items:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="#24826B"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg></span>
+        </div>
+        <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--color-green-600)">ANALYSE IA</span>
+      </div>
+      <svg data-reveal="1" data-reveal-delay="450" width="100%" height="44" viewBox="0 0 200 44" preserveAspectRatio="none" style="display:block"><path d="M100 0 C 100 22, 50 22, 50 44" stroke="#24826B" stroke-width="1.5" stroke-dasharray="8 4" fill="none" vector-effect="non-scaling-stroke" style="animation:cvDash 1.2s linear infinite"></path><path d="M100 0 C 100 22, 150 22, 150 44" stroke="#24826B" stroke-width="1.5" stroke-dasharray="8 4" fill="none" vector-effect="non-scaling-stroke" style="animation:cvDash 1.2s linear infinite"></path></svg>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+        <div data-reveal="1" data-reveal-delay="550" style="background:var(--color-white);border:1px solid var(--color-polar-blue);box-shadow:var(--shadow-2);padding:18px 20px;display:flex;flex-direction:column;gap:10px;font-size:12px">
+            <span style="font-family:var(--font-display);font-size:18px;font-weight:700">Fiducie</span>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--text-secondary)">Transfert</span><span style="font-weight:600">Acté</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">Protection</span><span style="display:flex;gap:2px"><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">Coût</span><span style="border:1px dashed var(--border-strong);padding:1px 6px;font-size:11px;color:var(--text-tertiary)">à définir</span></div>
+          </div>
+        <div data-reveal="1" data-reveal-delay="650" style="background:var(--color-white);border:1px solid var(--color-polar-blue);box-shadow:var(--shadow-2);padding:18px 20px;display:flex;flex-direction:column;gap:10px;font-size:12px">
+            <span style="font-family:var(--font-display);font-size:18px;font-weight:700">Agency</span>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--text-secondary)">Transfert</span><span style="font-weight:600">Possible</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">Protection</span><span style="display:flex;gap:2px"><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-green-500)"></span><span style="width:6px;height:6px;background:var(--color-polar-blue)"></span></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">Coût</span><span style="border:1px dashed var(--border-strong);padding:1px 6px;font-size:11px;color:var(--text-tertiary)">à définir</span></div>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="temoignages" data-screen-label="06 Témoignages" style="background:var(--color-white);border-bottom:1px solid var(--color-polar-blue)">
+  <div onMouseEnter="{{ tPause }}" onMouseLeave="{{ tResume }}" style="max-width:1280px;margin:0 auto;padding:72px 20px;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap">
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:24px">
+        <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-green-500)">Cas clients</div>
+        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;text-wrap:balance">Ils nous confient leurs financements.</h2>
+      </div>
+      <div data-reveal="1" style="display:flex;align-items:center;gap:16px">
+        <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);font-feature-settings:'tnum' 1">{{ tCount }}</span>
+        <div style="display:flex;gap:8px"><button onClick="{{ tPrev }}" aria-label="Précédent" style="width:48px;height:48px;display:grid;place-items:center;background:var(--color-white);border:1px solid var(--color-polar-blue);border-radius:4px;cursor:pointer;color:var(--color-ink);padding:0" style-hover="background:#081412;color:#fff;border-color:#081412"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><button onClick="{{ tNext }}" aria-label="Suivant" style="width:48px;height:48px;display:grid;place-items:center;background:var(--color-white);border:1px solid var(--color-polar-blue);border-radius:4px;cursor:pointer;color:var(--color-ink);padding:0" style-hover="background:#081412;color:#fff;border-color:#081412"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button></div>
+      </div>
+    </div>
+    <div data-reveal="1" style="position:relative;background:var(--color-bone);border:1px solid var(--color-polar-blue)">
+      <div style="display:grid">
+        <sc-for list="{{ testis }}" as="t" hint-placeholder-count="1">
+          <div style="grid-area:1/1;display:flex;flex-wrap:wrap;opacity:{{ t.op }};visibility:{{ t.vis }};pointer-events:{{ t.pe }};transform:translateY({{ t.y }}px);transition:opacity 600ms cubic-bezier(0.2,0,0,1),transform 700ms cubic-bezier(0.3,0,0,1),visibility 600ms">
+            <div style="flex:1 1 100%;padding:28px 22px 28px;display:flex;flex-direction:column;gap:28px;min-width:0">
+              <span style="font-family:var(--font-display);font-size:72px;line-height:0.6;height:28px;color:var(--color-green-500)">“</span>
+              <p style="margin:0;font-family:var(--font-display);font-size:18px;line-height:1.45;letter-spacing:-0.01em;color:var(--color-ink);text-wrap:pretty">{{ t.quote }}</p>
+            </div>
+            <div style="flex:1 1 100%;box-shadow:0 -1px 0 var(--color-polar-blue);padding:22px;display:flex;flex-direction:row-reverse;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;background:var(--color-white)">
+              <span style="align-self:flex-start;display:block">{{ t.logoEl }}</span>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:16px;font-weight:500">{{ t.name }}</span><span style="font-size:14px;color:var(--text-secondary)">{{ t.company }}</span></div>
+                <span style="align-self:flex-start;padding:4px 10px;border-radius:999px;background:var(--color-light-green-soft);border:1px solid var(--color-green-200);font-size:12px;color:var(--color-green-700)">{{ t.offer }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:16px 22px 22px;max-width:200px">
+        <sc-for list="{{ tDots }}" as="d" hint-placeholder-count="2">
+          <button onClick="{{ d.onClick }}" aria-label="Témoignage" style="height:14px;padding:6px 0;background:none;border:0;cursor:pointer;display:block"><span style="display:block;height:2px;background:var(--color-polar-blue);overflow:hidden">{{ d.fill }}</span></button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" data-screen-label="07 CTA" style="background:var(--color-green-500);color:#fff">
+  <div style="max-width:1280px;margin:0 auto;padding:72px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <h2 data-reveal="1" style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0;color:#fff;max-width:18ch;text-wrap:balance">Parlons de votre prochaine opération.</h2>
+      <p data-reveal="1" style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.86);margin:0;max-width:48ch">Un expert Covalt étudie votre dossier et vous adresse une proposition sur-mesure sous 48 heures.</p>
+    </div>
+    <div data-reveal="1" style="display:flex;flex-direction:column;gap:10px">
+      <a href="#" style="display:flex;justify-content:center;align-items:center;height:52px;padding:0 22px;background:#fff;color:var(--color-green-700);border-radius:4px;font-size:15px;font-weight:500" style-hover="background:#E0FEB3;color:#18594A">Obtenir une proposition</a>
+      <a href="#" style="display:flex;justify-content:center;align-items:center;height:52px;padding:0 22px;border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:4px;font-size:15px;font-weight:500" style-hover="border-color:#fff;color:#fff">Échanger avec un expert</a>
+    </div>
+  </div>
+</section>
+
+<footer style="background:var(--color-ink);color:rgba(255,255,255,0.7)">
+  <div style="max-width:1280px;margin:0 auto;padding:56px 20px 28px;display:flex;flex-direction:column;gap:64px">
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 20px">
+      <div style="display:flex;flex-direction:column;gap:16px;grid-column:span 2;min-width:0">
+        <img src="assets/covalt-wordmark.svg" alt="Covalt" style="height:24px;width:auto;align-self:flex-start;filter:invert(1) brightness(2)">
+        <span style="font-size:13px;line-height:1.55;max-width:34ch">Le partenaire des prêteurs pour sourcer, sécuriser et administrer leurs financements.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px"><span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:6px">OFFRES</span><a href="#offres-detail">Loan Connect</a><a href="#offres-detail">Loan Protection</a><a href="#offres-detail">Loan Servicing</a></div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px"><span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:6px">COVALT</span><a href="#technologie">Technologie</a><a href="#chiffres">Expertise</a><a href="#">Ressources</a><a href="#">Carrières</a></div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px"><span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:6px">CONTACT</span><a href="#contact">Obtenir une proposition</a><a href="#">Connexion plateforme</a><a href="#">LinkedIn</a></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em;color:rgba(255,255,255,0.4)"><span>© 2026 Covalt</span><span>Mentions légales · Confidentialité</span></div>
+  </div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:393,&quot;height&quot;:852},&quot;tabMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:9000,&quot;min&quot;:4000,&quot;max&quot;:15000,&quot;step&quot;:500,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;animations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;rotateMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1000,&quot;min&quot;:600,&quot;max&quot;:4000,&quot;step&quot;:100,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+const h = React.createElement;
+const EASE = 'cubic-bezier(0.3,0,0,1)';
+const WORDS = ['sourcer', 'sécuriser', 'administrer'];
+const Rotator = ({ idx }) => h('span', { style: { display: 'inline-grid', verticalAlign: 'top', overflow: 'hidden', paddingBottom: '0.12em', marginBottom: '-0.12em' } },
+  WORDS.map((w, i) => {
+    const prev = (idx + WORDS.length - 1) % WORDS.length;
+    return h('span', { key: w, style: { gridArea: '1/1', color: 'var(--color-green-500)', whiteSpace: 'nowrap',
+      transition: `transform 520ms ${EASE}, opacity 400ms ${EASE}`,
+      transform: i === idx ? 'translateY(0)' : i === prev ? 'translateY(-105%)' : 'translateY(105%)', opacity: i === idx ? 1 : 0 } }, w);
+  }));
+const Fill = ({ ms, running, color }) => h('span', { style: { display: 'block', height: '100%', background: color || 'var(--color-green-500)', transformOrigin: 'left', animation: `cvFill ${ms}ms linear forwards`, animationPlayState: running ? 'running' : 'paused' } });
+const pulse = (dir, delay) => h('span', { style: { position: 'absolute', width: dir === 'v' ? 5 : 40, height: dir === 'v' ? 14 : 1, left: dir === 'v' ? -2 : 0, background: dir === 'v' ? 'var(--color-light-green)' : 'linear-gradient(90deg,transparent,#E0FEB3,transparent)', animation: `${dir === 'v' ? 'cvPulseV 2.4s' : 'cvPulseH 4s'} ${delay}s infinite ${EASE}` } });
+const Dots = () => h(React.Fragment, null, [0, 1, 2].map(i => h('span', { key: i, style: { width: 6, height: 6, borderRadius: '50%', background: '#E0FEB3', animation: `cvType 1.2s ${i * 0.18}s infinite` } })));
+
+const POOL = [
+  { label: 'Virement banque CAC', cat: 'Virements', amt: 50000 },
+  { label: 'Retrait compte séquestre', cat: 'Retraits, chq. et vir.', amt: -60000 },
+  { label: 'Prélèvement taxe', cat: 'Taxes', amt: -4620 },
+  { label: 'Encaissement client', cat: 'Ventes', amt: 38450 },
+  { label: 'Loyer siège', cat: 'Dépenses pro', amt: -12300 },
+  { label: 'Salaires Stroke Effect', cat: 'Salaires', amt: -100000 },
+];
+const DEALS = [
+  { name: 'Horizon Croissance', obj: 'Financement immobilier', amount: '3 700 000 €', sec: 'Fiducie-sûreté', dur: '48 mois' },
+  { name: 'Opération Centurion', obj: 'Restructuration', amount: '15 250 999 €', sec: 'Agent des sûretés', dur: '60 mois' },
+  { name: 'Initiative Rubis', obj: "Financement d'acquisition", amount: '11 700 999 €', sec: 'Nantissement', dur: '72 mois' },
+  { name: 'Synergie Immo', obj: "Financement d'entreprise", amount: '8 500 000 €', sec: 'Fiducie-gestion', dur: '36 mois' },
+  { name: 'Élan Finance', obj: 'Financement immobilier', amount: '2 200 000 €', sec: 'Fiducie-sûreté', dur: '24 mois' },
+];
+const TASKS = [
+  { title: 'Représentation de la masse (RMO)', sub: 'Émission obligataire · Élan Finance' },
+  { title: 'Collecte du reporting T3', sub: 'Pivot Performance · échéance 30/10' },
+  { title: 'Gestion extinctive (GEX)', sub: 'Portefeuille Lab · 12 lignes' },
+  { title: 'Demande de waiver', sub: 'Horizon Croissance · covenant levier' },
+  { title: 'Calcul des ratios financiers', sub: 'Synergie Immo · T3 2026' },
+];
+const ST = [
+  { status: 'À INSTRUIRE', stColor: 'var(--color-warning)', ring: 'var(--color-warning)', dot: '#FFF6E5' },
+  { status: 'EN COURS', stColor: 'var(--color-green-600)', ring: 'var(--color-green-500)', dot: 'var(--color-green-100)' },
+  { status: 'TRAITÉ', stColor: 'var(--text-secondary)', ring: 'var(--color-green-500)', dot: 'var(--color-green-500)' },
+];
+const TESTI = [
+  { name: 'Yvan Gouchon', company: 'Seven Partners', logo: 'assets/logo-sevenpartners.png', logoH: 40, offer: 'Loan Protection', quote: "Dans un environnement économique plus incertain, il est essentiel de renforcer la sécurité des opérations sans les complexifier. C'est dans cette optique que nous avons fait le choix de nous appuyer sur les services Covalt Loan Protection. En externalisant le rôle d'agent des sûretés à leurs équipes d'experts, nous bénéficions d'un suivi structuré. Covalt assure pour nous un ensemble de contrôles clés et nous alerte en cas d'incident sur nos financements, ce qui nous permet d'activer rapidement les leviers adéquats." },
+  { name: 'Charly Abessolo', company: 'O2 Capital', logo: 'assets/logo-o2capital.png', logoH: 48, offer: 'Plateforme Covalt', quote: "Le suivi des covenants et des sûretés est un levier important de maîtrise du risque dans notre activité, mais il mobilisait jusqu'ici beaucoup de ressources. Avant Covalt, nous fonctionnions avec des rappels manuels (emails, téléphone) et des tableaux Excel. Depuis, tout est centralisé sur une plateforme collaborative et les rappels sont automatisés. Nous recevons des alertes précises à chaque échéance, ce qui nous permet d'être proactifs et de ne rien louper dans le suivi de nos financements." },
+];
+const fmt = (n, d = 2) => n.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+class Component extends DCLogic {
+  state = { menuOpen: false, panelMin: 0, sel: null, selAuto: false, requested: false, lastSel: -1, locked: false, tIdx: 0, tCycle: 0, tPaused: false, idx: 0, cycle: 0, tab: 1, tabCycle: 0, paused: false, balance: 187000.7, txs: [], txn: 0, alertStage: 0, tick: 0, statT: 0 };
+  rootRef = React.createRef(); statsRef = React.createRef(); panelRef = React.createRef();
+  pulses = { v0: pulse('v', 0), v1: pulse('v', 0.8), v2: pulse('v', 1.6), h: pulse('h', 0) };
+  dots = h(Dots);
+  elapsed = 0;
+
+  componentDidMount() {
+    const d = new Date();
+    const txs = [{ label: 'Salaires Stroke Effect', cat: 'Salaires', amt: -100000 }, { label: 'Encaissement client', cat: 'Ventes', amt: 38450 }, { label: 'Prélèvement taxe', cat: 'Taxes', amt: -4620 }]
+      .map((p, i) => this.mkTx(p, new Date(d - (i + 1) * 864e5 * 3), false));
+    this.setState({ txs });
+    this.startRotate();
+    if (this.anim()) {
+      this.feed = setInterval(() => this.nextTx(), 3200);
+      this.clock = setInterval(() => {
+        if (this.state.paused || this.state.locked || (this.state.sel !== null && !this.state.selAuto)) return;
+        this.elapsed += 100;
+        if (this.elapsed >= this.tabMs()) this.setTab((this.state.tab + 1) % 3);
+      }, 100);
+      this.tClock = setInterval(() => { if (!this.state.tPaused) this.goT(1); }, 8000);
+    }
+    this.setupReveal();
+  }
+  componentDidUpdate() {
+    const tabChanged = this._lastTab !== undefined && this._lastTab !== this.state.tab; this._lastTab = this.state.tab;
+    const pe = this.panelRef.current;
+    if (pe && (tabChanged || !this.state.panelMin)) requestAnimationFrame(() => { const c = pe.firstElementChild; const hh = c ? c.getBoundingClientRect().height : 0; if (hh > this.state.panelMin) this.setState({ panelMin: Math.ceil(hh) }); });
+    if (tabChanged) { this.cxTouched = false; clearTimeout(this.cxT); if (this.state.sel !== null) this.setState({ sel: null }); if (this.state.tab === 0) this.scheduleCx(); }
+    if (tabChanged && this.anim() && this.panelRef.current) {
+      this.panelRef.current.querySelectorAll('[data-panel-anim]').forEach((el, i) =>
+        el.animate([{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: i * 90, easing: 'cubic-bezier(0.2,0,0,1)', fill: 'both' }));
+    }
+  }
+  scheduleCx() {
+    clearTimeout(this.cxT);
+    if (this.state.tab !== 0 || !this.anim() || this.cxTouched) return;
+    this.cxT = setTimeout(() => {
+      const i = (this.state.lastSel + 2) % DEALS.length;
+      this.openDeal(i, true);
+      this.cxT = setTimeout(() => { this.setState({ sel: null }); this.scheduleCx(); }, 4500);
+    }, 3000);
+  }
+  openDeal(i, auto) {
+    if (!auto) { this.cxTouched = true; clearTimeout(this.cxT); }
+    this.setState({ sel: i, selAuto: auto, requested: false, lastSel: i });
+  }
+  goT(d) { this.setState(s => ({ tIdx: (s.tIdx + d + TESTI.length) % TESTI.length, tCycle: s.tCycle + 1 })); }
+  componentWillUnmount() { [this.rot, this.feed, this.clock, this.tClock].forEach(clearInterval); [this.t1, this.t2, this.fade, this.cxT].forEach(clearTimeout); this.io && this.io.disconnect(); this.sio && this.sio.disconnect(); }
+  anim() { return this.props.animations ?? true; }
+  ms() { return this.props.rotateMs ?? 1000; }
+  tabMs() { return this.props.tabMs ?? 9000; }
+  heroTabs() { return false; }
+  startRotate() {
+    clearInterval(this.rot);
+    if (!this.anim()) return;
+    this.rot = setInterval(() => this.setState(s => ({ idx: (s.idx + 1) % 3, cycle: s.cycle + 1 })), this.ms());
+  }
+  pickWord(i) { if (i === this.state.idx) return; this.setState(s => ({ idx: i, cycle: s.cycle + 1 })); this.startRotate(); }
+  setTab(i) { this.elapsed = 0; this.setState(s => ({ tab: i, tabCycle: s.tabCycle + 1 })); }
+  mkTx(p, date, fresh) {
+    return { key: Math.random(), date: date.toLocaleDateString('fr-FR'), label: p.label, cat: p.cat,
+      amount: (p.amt > 0 ? '+' : '') + fmt(p.amt), color: p.amt > 0 ? 'var(--color-green-500)' : 'var(--color-ink)',
+      bg: fresh ? (p.amt < -50000 ? '#FBE9E6' : 'var(--color-green-100)') : 'var(--color-white)' };
+  }
+  nextTx() {
+    const p = POOL[this.state.txn % POOL.length];
+    let bal = this.state.balance + p.amt;
+    if (bal < 60000) bal += 180000;
+    const big = p.amt < -50000;
+    this.setState(s => ({ txs: [this.mkTx(p, new Date(), true), ...s.txs.map(t => ({ ...t, bg: 'var(--color-white)' }))].slice(0, 3), txn: s.txn + 1, balance: bal, tick: s.tick + 1 }));
+    clearTimeout(this.fade);
+    this.fade = setTimeout(() => this.setState(s => ({ txs: s.txs.map(t => ({ ...t, bg: 'var(--color-white)' })) })), 1400);
+    if (big) {
+      clearTimeout(this.t1); clearTimeout(this.t2);
+      this.setState({ alertStage: 1 });
+      this.t1 = setTimeout(() => this.setState({ alertStage: 2 }), 1100);
+      this.t2 = setTimeout(() => this.setState({ alertStage: 3 }), 2800);
+    }
+  }
+  setupReveal() {
+    const root = this.rootRef.current; if (!root) return;
+    const on = this.anim();
+    this.io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting && e.target.__cv) { e.target.__cv.play(); this.io.unobserve(e.target); }
+    }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    if (on) root.querySelectorAll('[data-reveal]').forEach(el => {
+      const a = el.animate([{ opacity: 0, transform: 'translateY(28px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 900, easing: 'cubic-bezier(0.2,0,0,1)', fill: 'both', delay: Number(el.dataset.revealDelay || 0) });
+      a.pause(); el.__cv = a; this.io.observe(el);
+    });
+    const st = this.statsRef.current;
+    if (!st) return;
+    if (!on) { this.setState({ statT: 1 }); return; }
+    this.sio = new IntersectionObserver(es => {
+      if (!es[0].isIntersecting) return;
+      this.sio.disconnect();
+      const t0 = performance.now();
+      const step = now => { const t = Math.min(1, (now - t0) / 1600); this.setState({ statT: 1 - Math.pow(1 - t, 3) }); if (t < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }, { threshold: 0.4 });
+    this.sio.observe(st);
+  }
+
+  renderVals() {
+    const { idx, cycle, tab, tabCycle, paused, statT, tick, alertStage } = this.state;
+    const on = this.anim();
+    const heroTabs = this.heroTabs();
+    const OC = ['#007AA3', '#24826B', '#8A8A6A'];
+    const tabFill = i => i !== tab ? null : this.state.locked ? h('span', { style: { display: 'block', height: '100%', background: OC[i] } }) : h(Fill, { key: 't' + tabCycle, ms: this.tabMs(), running: on && !paused && this.state.sel === null, color: OC[i] });
+    const wordFill = i => i === idx ? h(Fill, { key: 'w' + cycle, ms: this.ms(), running: on }) : null;
+    const stripSel = heroTabs ? tab : idx;
+    const stripFill = heroTabs ? tabFill : wordFill;
+    const STATS = [
+      { pre: '', v: 3, unit: 'Md€', desc: 'de financements déjà sécurisés' },
+      { pre: '+', v: 450, unit: '', desc: "contrats de fiducie et d'agency mis en place" },
+      { pre: '', v: 95, unit: '%', desc: 'de taux de recouvrement moyen' },
+      { pre: '', v: 40, unit: '', desc: 'réalisations de sûretés menées à terme' },
+    ];
+    const hiDeal = tick % DEALS.length;
+    const tasks = TASKS.map((t, i) => { const st = ST[Math.min(2, Math.max(0, Math.floor((tick + i * 2) / 2) % 4 === 3 ? 2 : (Math.floor((tick + i * 2) / 2) % 4) % 3))]; return { ...t, ...st, bg: st.status === 'EN COURS' && i === tick % 5 ? 'var(--color-light-green-soft)' : 'var(--color-white)' }; });
+    const done = tasks.filter(t => t.status === 'TRAITÉ').length;
+    const names = ['Loan Connect', 'Loan Protection', 'Loan Servicing'];
+    const v = {
+      rootRef: this.rootRef, statsRef: this.statsRef, panelRef: this.panelRef,
+      rotator: h(Rotator, { idx }),
+      stats: STATS.map(s => ({ ...s, shown: fmt(Math.round(s.v * statT), 0) })),
+      balanceStr: fmt(this.state.balance) + ' €',
+      txs: this.state.txs,
+      alertOp: alertStage ? 1 : 0, alertY: alertStage ? 0 : 16,
+      humanOp: alertStage >= 2 ? 1 : 0, typing: alertStage === 2, written: alertStage === 3, dots: this.dots,
+      pulseV0: on ? this.pulses.v0 : null, pulseV1: on ? this.pulses.v1 : null, pulseV2: on ? this.pulses.v2 : null, pulseH: on ? this.pulses.h : null,
+      deals: DEALS.map((d, i) => ({ ...d, bg: i === this.state.sel ? '#E8F3F7' : i === hiDeal ? '#F3F9FB' : 'var(--color-white)', ring: i === this.state.sel ? 'inset 3px 0 0 #007AA3' : 'none', newOp: i === hiDeal ? 1 : 0, onClick: () => this.openDeal(i, false) })),
+      tasks, doneStr: done + '/' + tasks.length + ' traités',
+      isT0: tab === 0, isT1: tab === 1, isT2: tab === 2,
+      sectionTabs: !heroTabs,
+      offersPad: heroTabs ? '96px 32px 112px' : '128px 32px',
+      pause: () => this.setState({ paused: true }), resume: () => this.setState({ paused: false }),
+      tabs: names.map((n, i) => ({ name: n, num: '0' + (i + 1), op: i === tab ? 1 : 0.45, fill: tabFill(i), onClick: () => { this.setTab(i); this.setState({ locked: true }); } })),
+    };
+    [0, 1, 2].forEach(i => {
+      v['op' + i] = stripSel === i ? 1 : 0.5;
+      v['fill' + i] = stripFill(i);
+      v['tab' + i] = () => { this.setTab(i); this.setState({ locked: true }); };
+      v['strip' + i] = () => { this.setTab(i); if (!heroTabs) this.pickWord(i); };
+      v['hover' + i] = heroTabs ? undefined : () => this.pickWord(i);
+    });
+    [0, 1, 2].forEach(i => { v['tfill' + i] = tabFill(i); v['tf' + i] = i === tab ? 'none' : 'grayscale(1)'; v['tlo' + i] = i === tab ? 1 : 0.45; v['tc' + i] = i === tab ? ['#007AA3', '#24826B', '#6B6B4F'][i] : 'var(--text-tertiary)'; v['tclick' + i] = () => { this.setTab(i); this.setState({ locked: true }); }; });
+    const sd = this.state.sel !== null ? DEALS[this.state.sel] : DEALS[Math.max(0, this.state.lastSel)];
+    v.pop = sd; v.popOp = this.state.sel !== null ? 1 : 0; v.popPe = this.state.sel !== null ? 'auto' : 'none';
+    v.popY = this.state.sel !== null ? 0 : 16; v.popS = this.state.sel !== null ? 1 : 0.98;
+    v.requested = this.state.requested; v.notRequested = !this.state.requested;
+    v.popClose = () => { this.cxTouched = true; clearTimeout(this.cxT); this.setState({ sel: null }); };
+    v.popRequest = () => { this.cxTouched = true; clearTimeout(this.cxT); this.setState({ requested: true, selAuto: false }); };
+    v.cxTouch = () => { if (this.cxTouched) return; this.cxTouched = true; clearTimeout(this.cxT); if (this.state.selAuto) this.setState({ selAuto: false }); };
+    v.panelMin = this.state.panelMin; v.menuOpen = this.state.menuOpen; v.menuClosed = !this.state.menuOpen;
+    v.toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen })); v.closeMenu = () => this.setState({ menuOpen: false });
+    [0, 1, 2].forEach(i => { v['mtab' + i] = () => { this.setTab(i); this.setState({ menuOpen: false, locked: true }); }; });
+    v.mqState = on && !this.state.mqPaused ? 'running' : 'paused';
+    v.mqPause = () => this.setState({ mqPaused: true }); v.mqPlay = () => this.setState({ mqPaused: false });
+    const tI = this.state.tIdx;
+    v.testis = TESTI.map((t, i) => ({ ...t, logoEl: h('img', { src: t.logo, alt: t.company, style: { height: t.logoH, width: 'auto', display: 'block' } }), op: i === tI ? 1 : 0, y: i === tI ? 0 : 24, pe: i === tI ? 'auto' : 'none', vis: i === tI ? 'visible' : 'hidden' }));
+    v.tDots = TESTI.map((t, i) => ({ fill: i === tI ? h(Fill, { key: 'tc' + this.state.tCycle, ms: 8000, running: on && !this.state.tPaused }) : null, onClick: () => { this.setState({ tIdx: i, tCycle: this.state.tCycle + 1 }); clearInterval(this.tClock); this.tClock = setInterval(() => { if (!this.state.tPaused) this.goT(1); }, 8000); } }));
+    v.tCount = '0' + (tI + 1) + ' / 0' + TESTI.length;
+    v.tPrev = () => { this.goT(-1); }; v.tNext = () => { this.goT(1); };
+    v.tPause = () => this.setState({ tPaused: true }); v.tResume = () => this.setState({ tPaused: false });
+    return v;
+  }
+}
+</script>
+</body>
+</html>

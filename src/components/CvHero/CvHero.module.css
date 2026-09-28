@@ -1,0 +1,64 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bone);
+  border-bottom: 1px solid var(--color-polar-blue);
+}
+.engraving {
+  position: absolute;
+  right: -4%;
+  top: 0;
+  height: 100%;
+  width: 62%;
+  object-fit: cover;
+  object-position: right center;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 45%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 45%);
+}
+.inner {
+  position: relative;
+  padding-top: 120px;
+  padding-bottom: 128px;
+}
+.text {
+  margin: 36px 0 0;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+.ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 44px;
+}
+.arrow {
+  font-size: 16px;
+}
+@media (max-width: 767px) {
+  .engraving {
+    right: -30%;
+    height: 420px;
+    width: 110%;
+    object-position: right top;
+    opacity: 0.35;
+  }
+  .inner {
+    padding-top: 56px;
+    padding-bottom: 64px;
+  }
+  .text {
+    margin-top: 24px;
+    font-size: 17px;
+  }
+  .ctas {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 32px;
+  }
+}

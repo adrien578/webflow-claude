@@ -1,0 +1,156 @@
+.flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 40px 76px 48px minmax(0, 1fr);
+  align-items: center;
+}
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--color-polar-blue);
+  box-shadow: var(--shadow-2);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 12px;
+}
+.result {
+  gap: 10px;
+}
+.cardLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.line > :first-child {
+  color: var(--text-secondary);
+}
+.strong {
+  font-weight: 600;
+}
+.resultName {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+}
+.meter {
+  display: flex;
+  gap: 2px;
+}
+.meter span {
+  width: 6px;
+  height: 6px;
+  background: var(--color-polar-blue);
+}
+.meter .on {
+  background: var(--color-green-500);
+}
+.tbd {
+  border: 1px dashed var(--border-strong);
+  padding: 1px 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.dash {
+  display: block;
+  overflow: visible;
+}
+.dash path,
+.dash line {
+  stroke: var(--color-green-500);
+  stroke-width: 1.5;
+  stroke-dasharray: 8 4;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  animation: cvDash 1.2s linear infinite;
+}
+.dashV,
+.branchV {
+  display: none;
+}
+.node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.nodeCircle {
+  position: relative;
+  width: 76px;
+  height: 76px;
+}
+.ring,
+.disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.ring {
+  border: 1px solid var(--color-green-500);
+  animation: cvRing 2.4s var(--ease-standard) infinite;
+}
+.disc {
+  background: var(--color-white);
+  border: 1px solid var(--color-polar-blue);
+  box-shadow: var(--shadow-2);
+  display: grid;
+  place-items: center;
+}
+.nodeLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--color-green-600);
+  white-space: nowrap;
+}
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+@keyframes cvDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes cvRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+@media (max-width: 767px) {
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dashH,
+  .branchH {
+    display: none;
+  }
+  .dashV {
+    display: block;
+    align-self: center;
+  }
+  .branchV {
+    display: block;
+  }
+  .results {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}

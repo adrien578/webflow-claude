@@ -1,0 +1,20 @@
+.fill {
+  display: block;
+  height: 100%;
+  transform-origin: left center;
+  animation-name: cvFill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+.full {
+  display: block;
+  height: 100%;
+}
+@keyframes cvFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

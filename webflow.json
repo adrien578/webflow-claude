@@ -1,0 +1,10 @@
+{
+  "library": {
+    "name": "Covalt",
+    "id": "covalt-homepage",
+    "description": "Composants de code de la homepage Covalt v3 (hero, offres, illustrations animées, chiffres, technologie, Structuro, témoignages).",
+    "components": [
+      "./src/components/**/*.webflow.@(js|jsx|mjs|ts|tsx)"
+    ]
+  }
+}

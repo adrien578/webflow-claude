@@ -1,0 +1,48 @@
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(46px, 6.4vw, 92px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 0;
+  max-width: 14ch;
+  color: var(--color-ink);
+}
+.rotator {
+  display: inline-grid;
+  vertical-align: top;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.word {
+  grid-area: 1 / 1;
+  color: var(--color-green-500);
+  white-space: nowrap;
+  transition:
+    transform 520ms var(--ease-emphasized),
+    opacity 400ms var(--ease-emphasized);
+  transform: translateY(105%);
+  opacity: 0;
+}
+.active {
+  transform: translateY(0);
+  opacity: 1;
+}
+.prev {
+  transform: translateY(-105%);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .title {
+    font-size: 40px;
+    line-height: 1.05;
+  }
+}

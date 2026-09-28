@@ -1,0 +1,157 @@
+.diagram {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+.offers,
+.links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.offer {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-light-green);
+}
+.offerName {
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+.links {
+  height: 72px;
+}
+.line {
+  position: relative;
+  justify-self: center;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.pulseV {
+  position: absolute;
+  left: -2px;
+  width: 5px;
+  height: 14px;
+  background: var(--color-light-green);
+  opacity: 0;
+  animation: cvPulseV 2.4s var(--ease-emphasized) infinite;
+}
+.platform {
+  position: relative;
+  background: var(--color-green-500);
+  padding: 28px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+}
+.topLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+.pulseH {
+  position: absolute;
+  left: 0;
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e0feb3, transparent);
+  opacity: 0;
+  animation: cvPulseH 4s var(--ease-emphasized) infinite;
+}
+.platformName {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: -0.01em;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  font-size: 12px;
+}
+.static .pulseV,
+.static .pulseH {
+  display: none;
+}
+@keyframes cvPulseV {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+@keyframes cvPulseH {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+@media (max-width: 767px) {
+  .offers,
+  .links {
+    gap: 8px;
+  }
+  .offer {
+    padding: 12px;
+    gap: 4px;
+  }
+  .num {
+    font-size: 10px;
+  }
+  .offerName {
+    font-size: 15px;
+    line-height: 1.15;
+  }
+  .links {
+    height: 48px;
+  }
+  .platform {
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulseV,
+  .pulseH {
+    display: none;
+  }
+}

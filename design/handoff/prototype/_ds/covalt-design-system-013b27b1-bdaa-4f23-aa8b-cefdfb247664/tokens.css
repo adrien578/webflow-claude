@@ -1,0 +1,300 @@
+/* ============================================================
+   COVALT — Design Tokens
+   Single source of truth for color, type, space, motion.
+   Drop this file into any artboard or page; everything else
+   composes against these CSS custom properties.
+   ============================================================ */
+
+/* -------- Fonts --------------------------------------------- */
+/* Gerstner Programm FSL is the brand display face — it is
+   licensed (FontStand) and shipped from the Covalt asset
+   server when available. The cascade below falls through to
+   Gerstner Originals (open source, very close metrics) and
+   then a serif system stack so the layout never collapses
+   if the brand face is missing.
+
+   Inter is loaded from Google Fonts; it is the workhorse for
+   UI, body and labels.
+
+   Catalogue is reserved for editorial moments (covers, big
+   pull quotes). It is not loaded by default — if you need
+   it, import it on the page that uses it. */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* Gerstner Programm FSL — brand display face. Licensed via FontStand.
+   Hosted directly in the project under /fonts. We load all three weight
+   files supplied by the brand team under a single family name; the
+   browser picks the regular weight by default. */
+@font-face {
+  font-family: "Gerstner Programm FSL";
+  src: url("./fonts/GerstnerProgrammFSL-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gerstner Programm FSL";
+  src: url("./fonts/Gerstner_Original_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-matched fallback — kicks in only if the OTF fails to load,
+   keeping layout stable. */
+@font-face {
+  font-family: "Gerstner Programm Fallback";
+  src: local("Iowan Old Style"), local("Charter"), local("Cambria"), local("Georgia");
+  size-adjust: 102%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+:root {
+  /* Display — used for headlines, slide titles, hero copy.    */
+  /* Set tightly: line-height ~1.05 for >52px, ~1.20 for ≤30px. */
+  --font-display:
+    "Gerstner Programm FSL",
+    "Gerstner Programm",
+    "Gerstner Programm Fallback",
+    "Iowan Old Style",
+    "Charter",
+    "Cambria",
+    Georgia,
+    serif;
+
+  /* Text — used for everything else. UI, body, captions. */
+  --font-text:
+    "Inter",
+    "Inter Tight",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  /* Mono — for figures, IDs, code snippets. */
+  --font-mono:
+    "JetBrains Mono",
+    "SF Mono",
+    "IBM Plex Mono",
+    Menlo,
+    Consolas,
+    monospace;
+
+  /* -------- Color: brand --------------------------------- */
+  /* Primary green — the Covalt signature. Use for the logo
+     symbol fill, primary CTAs, key data highlights, and brand
+     surfaces. Pairs with light-green for soft backgrounds. */
+  --color-green-100: #E8F4F0;
+  --color-green-200: #C2E0D6;
+  --color-green-300: #87C0AC;
+  --color-green-500: #24826B;        /* primary */
+  --color-green-600: #1E6E5A;
+  --color-green-700: #18594A;
+  --color-green-900: #0A2D24;
+
+  /* Accent — light green. Used as a soft surface and as the
+     favicon ground. Never as primary text. */
+  --color-light-green: #E0FEB3;
+  --color-light-green-soft: #EFFFD8;
+
+  /* Brand deep — used for the wordmark, body text on light
+     surfaces, and the symbol counter form. */
+  --color-ink: #081412;             /* deepest, brand */
+  --color-ink-soft: #101010;        /* alt ink (Brandbook spec) */
+
+  /* -------- Color: neutrals ------------------------------- */
+  --color-white: #FFFFFF;
+  --color-bone: #F5F7F5;            /* off-white surface */
+  --color-mist: #F7F9FC;            /* cooler surface, for app */
+  --color-polar-blue: #DCE2DF;      /* hairlines, dividers */
+  --color-fog: #E1E5E2;
+  --color-stone: #97A099;
+  --color-graphite: #3B4046;
+  --color-charcoal: #1A1F1D;
+
+  /* -------- Color: secondary palette ---------------------- */
+  /* Brandbook page 7 — supporting hues. Use sparingly, mostly
+     for editorial illustrations and chart accents. */
+  --color-brown: #8D886C;
+  --color-blue: #51828C;
+
+  /* -------- Color: semantic ------------------------------- */
+  --color-success: #24826B;
+  --color-warning: #C58A2E;
+  --color-danger: #B23A2E;
+  --color-info: #51828C;
+
+  /* -------- Color: text aliases --------------------------- */
+  --text-primary: var(--color-ink);
+  --text-secondary: rgba(8, 20, 18, 0.62);
+  --text-tertiary: rgba(8, 20, 18, 0.40);
+  --text-on-green: #FFFFFF;
+  --text-on-light-green: var(--color-ink);
+
+  /* -------- Color: surfaces ------------------------------- */
+  --surface-page: var(--color-bone);
+  --surface-card: var(--color-white);
+  --surface-sunken: var(--color-mist);
+  --surface-inverse: var(--color-ink);
+  --border-subtle: var(--color-polar-blue);
+  --border-strong: rgba(8, 20, 18, 0.16);
+
+  /* -------- Type scale ------------------------------------ */
+  /* Per Brandbook 24 — display sizes use Gerstner with tight
+     line-heights; body uses Inter at 140%. Letter-spacing
+     is consistently -0.5% (-0.005em) across faces. */
+  --fs-display-xl: 96px;
+  --fs-display-l:  72px;
+  --fs-display-m:  56px;
+  --fs-display-s:  40px;
+  --fs-h1: 32px;
+  --fs-h2: 24px;
+  --fs-h3: 20px;
+  --fs-body-l: 18px;
+  --fs-body:   16px;
+  --fs-body-s: 14px;
+  --fs-caption: 12px;
+
+  --lh-tight: 1.05;
+  --lh-snug:  1.20;
+  --lh-text:  1.40;
+  --lh-loose: 1.55;
+
+  --tracking-tight: -0.005em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-eyebrow: 0.08em;
+
+  /* -------- Spacing (4-pt scale) -------------------------- */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+  --space-13: 128px;
+  --space-14: 160px;
+
+  /* -------- Radii ----------------------------------------- */
+  /* Covalt évite les rayons. Les coins sont nets, à l'image d'un
+     document financier. Seules deux exceptions : un très léger
+     rayon sur les inputs/boutons (4 px) pour éviter l'effet
+     "métallique", et le pill (∞) pour les tags et avatars. */
+  --radius-xs: 0;
+  --radius-s:  0;
+  --radius-m:  0;
+  --radius-l:  0;
+  --radius-xl: 0;
+  --radius-input: 4px;
+  --radius-pill: 999px;
+
+  /* -------- Elevation ------------------------------------- */
+  --shadow-1: 0 1px 2px rgba(8, 20, 18, 0.04), 0 0 0 1px rgba(8, 20, 18, 0.04);
+  --shadow-2: 0 2px 6px rgba(8, 20, 18, 0.06), 0 0 0 1px rgba(8, 20, 18, 0.05);
+  --shadow-3: 0 8px 24px rgba(8, 20, 18, 0.08), 0 0 0 1px rgba(8, 20, 18, 0.05);
+  --shadow-4: 0 24px 48px rgba(8, 20, 18, 0.12), 0 0 0 1px rgba(8, 20, 18, 0.06);
+
+  /* -------- Motion ---------------------------------------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --duration-slow: 360ms;
+
+  /* -------- Containers ------------------------------------ */
+  --container-narrow: 720px;
+  --container-prose:  920px;
+  --container-default: 1200px;
+  --container-wide:   1440px;
+}
+
+/* -------- Dark mode override -------------------------------- */
+[data-theme="dark"] {
+  --surface-page: #0A1614;
+  --surface-card: #0F1E1B;
+  --surface-sunken: #07110F;
+  --surface-inverse: var(--color-bone);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text-primary: #ECEFEC;
+  --text-secondary: rgba(236, 239, 236, 0.66);
+  --text-tertiary: rgba(236, 239, 236, 0.42);
+  --color-green-500: #4FB39A;
+  --color-light-green: #B6E07A;
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  --shadow-2: 0 2px 6px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  --shadow-3: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* -------- Base styles --------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-text);
+  letter-spacing: var(--tracking-tight);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--lh-snug);
+  margin: 0;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+h1 { font-size: var(--fs-display-m); line-height: var(--lh-tight); }
+h2 { font-size: var(--fs-display-s); line-height: var(--lh-snug); }
+h3 { font-size: var(--fs-h1); }
+h4 { font-size: var(--fs-h2); }
+h5 { font-size: var(--fs-h3); }
+
+p { margin: 0; text-wrap: pretty; }
+
+a { color: inherit; text-decoration: none; }
+
+/* -------- Utility primitives -------------------------------- */
+.eyebrow {
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+.tnum {
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+.hairline {
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  margin: 0;
+}
