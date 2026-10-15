@@ -184,3 +184,11 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 - Un slot Webflow se rend en `div` : le slot porte lui-même la classe de mise en page (`cv-grille`,
   `cv-rangee`, `cv-marquee-groupe`) pour que les enfants soient des items flex directs.
 - `-webkit-mask-image` refusé par l'API : seul `mask-image` est posé (Safari < 15.4 sans fondu).
+
+## Correctifs après la phase 3
+- Les éléments décoratifs vides (carrés de niveau, barres, points, trait du Security Package, barre d'étape du Process) s'affichaient en gros blocs dans le Designer (taille de remplissage des éléments vides) et un `span` vide ne prend pas sa taille. Ils sont remplacés par des HtmlEmbed portant les mêmes classes (51 éléments dans CV Illustration dépôt de projet, CV Notification, CV Illustration process, CV Process, CV Comparateur garanties).
+
+## Phase 4 : cv-site.js (en attente de validation)
+- Fichiers : `cv-site/cv-site.js` (source), `cv-site/cv-site.min.js` (14,6 Ko, 5,7 Ko gzip), `cv-site/README.md`.
+- Testé dans Chromium (Playwright) sur un balisage équivalent : aucun message d'erreur ; états corrects avec et sans `prefers-reduced-motion`.
+- Rien n'est encore ajouté au code personnalisé du site.
