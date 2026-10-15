@@ -208,3 +208,21 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 - SEO : titre, description (sous-titre du hero), Open Graph (gravure), JSON-LD FAQPage (6 questions).
 - Une seule h1 (dans CV Hero).
 - Aperçu : https://webflow.com/design/covalt-eu?pageId=6ad0f45f6e417348388d5ac1
+
+## Phase 5 bis : mise à jour des pages en ligne (accord de l'utilisateur)
+Demande de l'utilisateur : garder les URL actuelles, retirer les anciens blocs, assembler les nouveaux.
+Rien n'est publié : les changements partent en ligne à la prochaine publication du site.
+
+| Page | ID | Chemin |
+|---|---|---|
+| Refinancement | `6a19aa5f1ef50c762415a9a4` | /loan-connect/lp/refinancement |
+| Reprise d'entreprise | `6a19aa72d7e9f8e0989bcc2f` | /loan-connect/lp/reprise-entreprises |
+| Financement immobilier | `6a19a818cbf740622cf8f23f` | /loan-connect/lp/financement-immo |
+
+- Retirés de chaque page : LC_Hero, Section_Chiffres_Cles, references, Section_columns, LC_Process, Colonne et image, LC_Pricing, section native « Frame … », LC_Meeting_Link, LC_Section_FAQ, footer_LC_LP. Les composants eux-mêmes ne sont pas modifiés.
+- Assemblés : même ordre que la v2 (Header … Footer). Reprise et immobilier : 4 cartes Opérations et 3 puces Security Package.
+- FAQ : liste CMS en sélection manuelle (reprise `…301a` à `…3024`, immobilier `…3026` à `…3030`). Les éléments CMS ne sont pas encore publiés : ils le seront avec la publication du site.
+- SEO : titres inchangés, description = sous-titre du hero, image Open Graph = gravure, JSON-LD FAQPage.
+- Code de page conservé (script de transmission des UTM vers connect.covalt.eu).
+- Props remplies par `outils/remplir-lp.py` (calcule les valeurs depuis `contenus/*.json` et ne renvoie que les écarts).
+- Les brouillons `refinancement-v2` (`6ad0f45f6e417348388d5ac1`) et `reprise-entreprise-v2` (`6ad0f708d48705c01346a7ea`) ne servent plus. L'API ne permet pas de supprimer une page : à supprimer à la main dans Webflow.
