@@ -191,4 +191,7 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 ## Phase 4 : cv-site.js (en attente de validation)
 - Fichiers : `cv-site/cv-site.js` (source), `cv-site/cv-site.min.js` (14,6 Ko, 5,7 Ko gzip), `cv-site/README.md`.
 - Testé dans Chromium (Playwright) sur un balisage équivalent : aucun message d'erreur ; états corrects avec et sans `prefers-reduced-motion`.
-- Rien n'est encore ajouté au code personnalisé du site.
+- Branchement (accord de l'utilisateur) : embed « Animations (cv-site.js) » (`1674d922-6194-603b-c040-574a2dc53125`) ajouté à la fin du composant CV Footer Loan Connect :
+  `<script src="https://cdn.jsdelivr.net/gh/adrien578/webflow-claude@e5465d655bf59243a925dc8c26877a11259fc028/cv-site/cv-site.min.js" defer></script>`
+  Version figée par le numéro de commit. Pour une mise à jour : pousser le nouveau fichier, puis remplacer le numéro de commit dans l'embed.
+  Le code personnalisé global du site n'est pas modifié.
