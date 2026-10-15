@@ -195,3 +195,16 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
   `<script src="https://cdn.jsdelivr.net/gh/adrien578/webflow-claude@e5465d655bf59243a925dc8c26877a11259fc028/cv-site/cv-site.min.js" defer></script>`
   Version figée par le numéro de commit. Pour une mise à jour : pousser le nouveau fichier, puis remplacer le numéro de commit dans l'embed.
   Le code personnalisé global du site n'est pas modifié.
+
+## Phase 5 : LP Refinancement v2 (en attente de validation)
+- Page « Loan Connect - Refinancement (v2) » `6ad0f45f6e417348388d5ac1`, brouillon, chemin `/loan-connect/lp/refinancement-v2` (dossier `6a19a7b54e31974a7541e1fb`).
+- Ordre : Header, Hero, Logos, Opérations, Avantages, Process, Security Package, Tarifs, Témoignage, FAQ (section native + liste CMS en sélection manuelle des 6 questions Refinancement), Rendez-vous, Footer.
+- Textes repris de `contenus/refinancement.json` (titre du hero : variante « reseau »).
+- Hero : gravure, icône pastille refinancement, aplat en variante Hero, bouton 2 Secondaire « Parler à un expert » → #contact, chiffres 2 et 3.
+- Logos : 9 prêteurs dans l'ordre du JSON. Opérations : carte 2 « Refinancement » (icône refresh).
+- Avantages : grille en variante Tuiles, ancre `avantages`, sans CTA, 3 cartes Tuile (users, dossier, rapide).
+- Process : bouton 1 sans flèche, bouton 2 variante Lien « Échanger avec un expert » → #contact.
+- Security Package : puces en variante Sombre, puce 2 « Mise en ligne rapide ».
+- SEO : titre, description (sous-titre du hero), Open Graph (gravure), JSON-LD FAQPage (6 questions).
+- Une seule h1 (dans CV Hero).
+- Aperçu : https://webflow.com/design/covalt-eu?pageId=6ad0f45f6e417348388d5ac1
