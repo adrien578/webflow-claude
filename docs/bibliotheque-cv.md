@@ -74,3 +74,41 @@ titres du site impose une couleur sombre.
 ### Notes techniques
 - Les « Text Block » créés par l'API n'acceptent pas de texte : utiliser des paragraphes.
 - L'API Webflow limite le débit (429) : travailler par lots d'environ 15 actions.
+
+## Phase 2 : éléments (en cours)
+
+### Icônes de cartes (assets SVG, trait 1,5, #007AA3)
+| Fichier | Asset ID | Utilisation |
+|---|---|---|
+| cv-icone-balance.svg | `6ad0dcf57e2f9d3109266c18` | Restructuration de dette |
+| cv-icone-refresh.svg | `6ad0dd2a6952d19e86b2b122` | Refinancement |
+| cv-icone-users.svg | `6ad0dd2d67287399eedbffb6` | Un réseau diversifié, MBO |
+| cv-icone-dossier.svg | `6ad0dcf67f5fcd0f5a690565` | Un dossier renforcé |
+| cv-icone-rapide.svg | `6ad0dd2994fe777334e987bd` | Un processus rapide |
+| cv-icone-mbi.svg | `6ad0dd2882deca68e35c4eef` | Reprise externe (MBI) |
+| cv-icone-obo.svg | `6ad0dd29d9dc408fb8aa6330` | Réorganisation du capital (OBO) |
+| cv-icone-croissance.svg | `6ad0dcf6220fab9abc1493e7` | Croissance externe |
+| cv-icone-immeuble.svg | `6ad0dcf73069324fdde5298c` | Acquisition long terme |
+| cv-icone-marchand.svg | `6ad0dcf75b28c01af07fb6bd` | Marchands de biens |
+| cv-icone-relais.svg | `6ad0dd2c388422e67934acaf` | Crédit relais (bridge) |
+| cv-icone-atypique.svg | `6ad0dcf53069324fdde527eb` | Opérations atypiques |
+
+Le code d'un embed HTML ne peut pas être lié à une prop : les icônes de cartes passent donc
+par une prop Image. La flèche du bouton et la coche des puces restent en embed (currentColor).
+
+### Composants (groupe « Covalt / Éléments »)
+| Composant | ID | Props | Variantes |
+|---|---|---|---|
+| CV Bouton | `e0f40d7d-88e8-794e-7487-931bac29e8ce` | Libellé, Lien, Icône flèche | Primaire (base), Secondaire, Contour clair, Lien |
+| CV CTA + mention | `65f033fb-33d2-cb51-495a-90544fc70b9f` | Libellé, Lien, Mention | – |
+| CV Surtitre | `2e82a713-b034-10a9-3342-1f1780b1f4b2` | Texte | Clair (base), Sombre, Blanc |
+| CV Carte | `d98ae46c-2520-d562-7437-a1149d13a411` | Icône (image), Titre (h3), Texte | Opération (base), Tuile |
+| CV Chiffre clé | `f012afa4-9d4e-39b2-5576-955e3114120e` | Valeur, Libellé | – |
+| CV Puce | `d159b185-a69e-3af6-775f-5281d7a00cfb` | Texte | Clair (base), Sombre |
+
+Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-carte-tete`, `cv-carte-icone`,
+`cv-carte-titre`, `cv-carte-texte`, `cv-chiffres` (conteneur), `cv-chiffre`, `cv-chiffre-valeur`,
+`cv-chiffre-libelle`, `cv-puce`, `cv-puce-icone`. Variables ajoutées : `cv-voile-blanc`, `cv-trait-encre`.
+
+- Bouton et CTA : pleine largeur et 52 px sous 767 px (sauf variante Lien).
+- Chiffres : séparateurs et largeurs (10ch / 19ch) gérés par `:first-child` / `:last-child` dans `cv-chiffres`.
