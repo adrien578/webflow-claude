@@ -113,7 +113,7 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 - Bouton et CTA : pleine largeur et 52 px sous 767 px (sauf variante Lien).
 - Chiffres : séparateurs et largeurs (10ch / 19ch) gérés par `:first-child` / `:last-child` dans `cv-chiffres`.
 
-## Phase 3 : sections (en cours)
+## Phase 3 : sections (terminée, en attente de validation)
 
 ### CMS
 - Collection **FAQ** `6ad0def2782052c2bc55a57b` : Question (champ Name), Réponse (texte riche), Page (option :
@@ -149,6 +149,37 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 | CV Logos | `ae918eff-851e-9cdb-2b38-9880696ecdd9` | Libellé ; slot Logos | – |
 | CV Logo (élément) | `93854efe-8edd-2e44-ffe3-0ddeea569340` | Image, Nom du prêteur | – |
 | CV Témoignage | `634143ce-5376-2cb8-44ea-250748353674` | Visibilité, Surtitre, Citation, Nom, Contexte | – |
+| CV Tarifs | `da381327-08f9-3b8c-bd9f-a7e1d8d983c1` | 13 props groupées | – |
+| CV Prise de rendez-vous | `8918ad09-40e1-9f9a-f9e1-cb294ebe23f6` | Ancre, Surtitre, Titre, Texte, Libellé lien, Lien, URL calendrier (JS), URL page de réservation | – |
+| CV Section 2 colonnes | `d6f2a6f1-bbb4-c50c-9934-f2405cf0f888` | Ancre ; slots Texte, Illustration | Bone, Blanc, Encre, Bleu, Bone · illu. à gauche, Blanc · illu. à gauche |
+| CV Illustration sur aplat | `15edc366-b30e-74ee-198b-40e58f6cbbdb` | slots Carte, Notification | Standard, Hero |
+| CV Hero | `5363a5d9-22fe-537f-a9f5-7d61627c1fbf` | Ancre, Pastille, Icône pastille, Titre avant/accent/après, Sous-titre, Mention, Gravure ; slots Boutons, Chiffres, Illustration | – |
+| CV Process | `08b9ddbc-efd8-4524-6fcf-0bc8bbbcd328` | Ancre, Surtitre, Titre, 4 × (titre, texte) ; slots Actions, Illustration | – |
+| CV Security Package | `44499a7e-537d-225c-8162-43b1d069f392` | Ancre, Surtitre, Titre, Paragraphe 1, Paragraphe 2 ; slots Puces, Carte | – |
+
+### Composants (groupe « Covalt / Illustrations »)
+| Composant | ID | Props | Notes |
+|---|---|---|---|
+| CV Illustration dépôt de projet | `d6037ab4-f82c-34b9-1def-a70fa89e60d3` | Montant, Durée, Objet, Secteur, Résumé, Option 1/2 + coûts | État final ; formulaire replié (`cv-depot-form`, 0fr) pour le module `depot-projet` |
+| CV Notification | `b8571935-9eec-733f-5106-65c805b811a5` | Initiales, Auteur, Début en gras, Suite du message | – |
+| CV Illustration process | `0ab72229-59fc-ce91-0f1a-7f6df9e360b1` | Objet, Documents 1-3, Garantie recommandée, Résumé du projet | 4 écrans `data-cv-panneau` ; 2 à 4 en `cv-pp--cache` sans JS |
+| CV Comparateur garanties | `1f8f3e1a-54a0-20d0-fb16-384b80eade7a` | 1er scénario (montant, durée, secteur, garantie 1, coûts, totaux) + Scénarios (JS) | Attribut `data-cv-scenarios` : `m\|d\|secteur\|mois\|fiducie\|garantie1;…` (l'API refuse les guillemets) |
+
+### Attributs lus par cv-site.js
+- `data-cv-anim` : `rdv`, `depot-projet`, `process`, `process-ecrans`, `comparateur` (+ `reveal`, `marquee`, `faq` prévus).
+- `data-cv-url` (rdv, `{email}` remplacé), `data-cv-liste` (champ en liste déroulante), `data-cv-etape`, `data-cv-panneau`, `data-cv-scenarios`.
+
+### Nouveaux tokens et assets
+- Variables : `cv-bleu-teinte-clair` #F4F9FB (`variable-20794363-84e5-fecc-5fb5-b039f7e4f78d`), `cv-bleu-trait` #DCE8EE (`variable-cd898c9e-855f-0a81-22f4-ccd0fd684b1e`).
+- Icônes de pastille (#005A78) : refinancement `6ad0e76c4a7f33840ea3e3d0`, reprise `6ad0e76c5a866bda5905a839`, immobilier `6ad0e76cd89e98ffd3f595df`.
+
+### Responsive
+- Mobile (≤767) : hero 40/56 px, gravure 115 % à .22, boutons empilés, chiffres en liste (valeur à gauche, libellé à droite), aplat qui déborde jusqu'au bord (−20 px), notification en bas pleine largeur, carte RDV 28/20, process titres 21 px.
+- La grille 2 colonnes reste en `auto-fit` (420 / 380 px) : bascule naturelle sous ~900 px ; les variantes « illustration à gauche » repassent à l'ordre normal en mobile.
+
+### Reste à faire / limites
+- Tri et filtre de la liste CMS FAQ : refusés par l'API (erreur MPS « Conflict… component map ») ; à régler dans le Designer (filtre Page = …, tri Ordre croissant).
+- Captures d'écran : impossibles tant que le Designer n'est pas au premier plan.
 
 - Un slot Webflow se rend en `div` : le slot porte lui-même la classe de mise en page (`cv-grille`,
   `cv-rangee`, `cv-marquee-groupe`) pour que les enfants soient des items flex directs.
