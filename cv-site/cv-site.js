@@ -105,11 +105,28 @@
     });
   }
 
-  /* rdv : formulaire e-mail, puis iframe HubSpot (data-cv-url, {email} encodé). */
+  /* Suivi des sources : recopie les UTM / gclid de la page sur une URL de prise de rendez-vous,
+     plus la page d'origine et le cookie HubSpot (comme le code d'intégration officiel HubSpot). */
+  var UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid'];
+  function suivi(href) {
+    try {
+      var u = new URL(href, location.href), p = new URLSearchParams(location.search);
+      UTM.forEach(function (k) { if (p.get(k)) u.searchParams.set(k, p.get(k)); });
+      if (u.searchParams.get('embed')) {
+        u.searchParams.set('parentHubspotUrl', location.href);
+        var utk = document.cookie.match(/(?:^|;\s*)hubspotutk=([^;]+)/);
+        if (utk) u.searchParams.set('parentHubspotUtk', decodeURIComponent(utk[1]));
+      }
+      return u.toString();
+    } catch (e) { return href; }
+  }
+
+  /* rdv : formulaire e-mail, puis iframe HubSpot (data-cv-url, {email} encodé), UTM transmis. */
   function rdv() {
     anims('rdv').forEach(function (root) {
       var form = $('form', root), input = form && $('input[type="email"]', form), tpl = root.getAttribute('data-cv-url');
       if (!form || !input || !tpl) return;
+      $$('a[href*="/meetings/"]', root).forEach(function (a) { a.href = suivi(a.href); });
       var cal = document.createElement('div'), bar = document.createElement('div'), mail = document.createElement('span');
       var back = document.createElement('button'), frame = document.createElement('iframe');
       css(cal, { display: 'none', flexDirection: 'column', width: '100%', maxWidth: '720px', background: '#fff', borderRadius: '4px', overflow: 'hidden' });
@@ -125,7 +142,7 @@
         if (form.checkValidity && !form.checkValidity()) { form.reportValidity && form.reportValidity(); return; }
         var v = input.value.trim();
         mail.textContent = v;
-        frame.src = tpl.replace('{email}', encodeURIComponent(v));
+        frame.src = suivi(tpl.replace('{email}', encodeURIComponent(v)));
         form.style.display = 'none'; cal.style.display = 'flex';
       });
       back.addEventListener('click', function () { cal.style.display = 'none'; form.style.display = ''; input.focus(); });
