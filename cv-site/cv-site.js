@@ -4,6 +4,8 @@
  */
 (function () {
   'use strict';
+  if (window.cvSite) return;
+  window.cvSite = true;
 
   var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var BLUE = '#007AA3', TINT = '#EEF6F9', TBD = '#B8D8E6', DARK = '#005A78';
@@ -14,7 +16,13 @@
 
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
   function $$(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
-  function anims(name) { return $$('[data-cv-anim="' + name + '"]'); }
+  /* Chaque bloc n'est activé qu'une fois, même si le script est chargé deux fois (aperçu Webflow). */
+  function anims(name) {
+    return $$('[data-cv-anim="' + name + '"]').filter(function (el) {
+      if (el.hasAttribute('data-cv-pret')) return false;
+      el.setAttribute('data-cv-pret', ''); return true;
+    });
+  }
   function ease(t) { return 1 - Math.pow(1 - t, 3); }
   function clamp(v) { return Math.max(0, Math.min(1, v)); }
   function css(el, o) { if (el) for (var k in o) el.style[k] = o[k]; }

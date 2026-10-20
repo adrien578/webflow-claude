@@ -2,7 +2,7 @@
 
 Script unique des animations des blocs Covalt construits en natif dans Webflow (vanilla JS, sans dépendance).
 
-- Source lisible : `cv-site.js`. Version à publier : `cv-site.min.js` (15,8 Ko, 6,1 Ko gzip, budget 15 Ko).
+- Source lisible : `cv-site.js`. Version à publier : `cv-site.min.js` (15,9 Ko, 6,2 Ko gzip, budget 15 Ko).
 - Régénérer la version minifiée : `npx terser@5 cv-site.js -c -m --comments '/^!/' -o cv-site.min.js`.
 - Sans JS ou avec `prefers-reduced-motion`, la page garde l'état final livré par Webflow.
 
