@@ -192,7 +192,7 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 - Fichiers : `cv-site/cv-site.js` (source), `cv-site/cv-site.min.js` (15,9 Ko, 6,2 Ko gzip), `cv-site/README.md`.
 - Testé dans Chromium (Playwright) sur un balisage équivalent : aucun message d'erreur ; états corrects avec et sans `prefers-reduced-motion`.
 - Branchement (accord de l'utilisateur) : embed « Animations (cv-site.js) » (`1674d922-6194-603b-c040-574a2dc53125`) ajouté à la fin du composant CV Footer Loan Connect :
-  `<script src="https://cdn.jsdelivr.net/gh/adrien578/webflow-claude@dab470d6b010ee2fae849115e37198510ef15183/cv-site/cv-site.min.js" defer></script>`
+  `<script src="https://cdn.jsdelivr.net/gh/adrien578/webflow-claude@d3b1acd7629a87ed854f3da45befa75e14c99d37/cv-site/cv-site.min.js" defer></script>`
   Version figée par le numéro de commit. Pour une mise à jour : pousser le nouveau fichier, puis remplacer le numéro de commit dans l'embed.
   Le code personnalisé global du site n'est pas modifié.
 
@@ -239,3 +239,4 @@ Rien n'est publié : les changements partent en ligne à la prochaine publicatio
 - Prop « URL calendrier (JS) » : valeur par défaut sans `email={email}` ; la prop « URL page de réservation » n'est plus utilisée.
 - cv-site.js : sans formulaire, l'iframe est insérée à 600 px du bloc (chargement différé), avec UTM / gclid / parentHubspotUrl / parentHubspotUtk ; hauteur ajustée par les messages HubSpot. Le mode formulaire reste géré.
 - Correctif : calendrier affiché en double dans l'aperçu Webflow (script exécuté deux fois). cv-site.js ne s'exécute plus qu'une fois (`window.cvSite`) et chaque bloc `data-cv-anim` est marqué `data-cv-pret` à l'activation. Testé avec le script chargé deux fois : 1 calendrier, bandeau de logos non dupliqué. Embed : commit `dab470d6b010ee2fae849115e37198510ef15183`.
+- Doublon encore signalé : l'insertion du calendrier vérifie maintenant qu'aucune iframe n'est déjà présente dans le bloc ; la carte est trouvée par `.cv-rdv-carte` si l'attribut vide `data-cv-calendrier` est retiré par Webflow. Le script n'est chargé nulle part ailleurs (code du site et des pages vérifié). Embed : commit `d3b1acd7629a87ed854f3da45befa75e14c99d37`.
