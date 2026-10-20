@@ -189,10 +189,10 @@ Classes ajoutées : `cv-bouton`, `cv-bouton-icone`, `cv-cta`, `cv-carte`, `cv-ca
 - Les éléments décoratifs vides (carrés de niveau, barres, points, trait du Security Package, barre d'étape du Process) s'affichaient en gros blocs dans le Designer (taille de remplissage des éléments vides) et un `span` vide ne prend pas sa taille. Ils sont remplacés par des HtmlEmbed portant les mêmes classes (51 éléments dans CV Illustration dépôt de projet, CV Notification, CV Illustration process, CV Process, CV Comparateur garanties).
 
 ## Phase 4 : cv-site.js (en attente de validation)
-- Fichiers : `cv-site/cv-site.js` (source), `cv-site/cv-site.min.js` (15,2 Ko, 5,9 Ko gzip), `cv-site/README.md`.
+- Fichiers : `cv-site/cv-site.js` (source), `cv-site/cv-site.min.js` (15,8 Ko, 6,1 Ko gzip), `cv-site/README.md`.
 - Testé dans Chromium (Playwright) sur un balisage équivalent : aucun message d'erreur ; états corrects avec et sans `prefers-reduced-motion`.
 - Branchement (accord de l'utilisateur) : embed « Animations (cv-site.js) » (`1674d922-6194-603b-c040-574a2dc53125`) ajouté à la fin du composant CV Footer Loan Connect :
-  `<script src="https://cdn.jsdelivr.net/gh/adrien578/webflow-claude@7b88128cc27708236f427803ebe9a4787c710abb/cv-site/cv-site.min.js" defer></script>`
+  `<script src="https://cdn.jsdelivr.net/gh/adrien578/webflow-claude@909a9ac0f3521653bb6c619d84043417934a0086/cv-site/cv-site.min.js" defer></script>`
   Version figée par le numéro de commit. Pour une mise à jour : pousser le nouveau fichier, puis remplacer le numéro de commit dans l'embed.
   Le code personnalisé global du site n'est pas modifié.
 
@@ -231,4 +231,10 @@ Rien n'est publié : les changements partent en ligne à la prochaine publicatio
 - Le script UTM de chaque page (code « before body ») continue de s'appliquer aux boutons vers connect.covalt.eu : ce sont des liens `<a>`.
 - Le calendrier HubSpot intégré n'est pas un lien : `cv-site.js` (module `rdv`, fonction `suivi`) recopie maintenant utm_source, utm_medium, utm_campaign, utm_term, utm_content et gclid sur l'URL de l'iframe et sur les liens `/meetings/` du bloc. Il ajoute aussi `parentHubspotUrl` (page d'origine) et `parentHubspotUtk` (cookie hubspotutk), comme le code d'intégration officiel HubSpot.
 - Testé dans Chromium avec `?utm_source=google&utm_medium=cpc&utm_campaign=refi&gclid=XYZ` : paramètres présents sur l'iframe et le lien, cookie transmis, aucune erreur.
-- Embed du footer passé au commit `7b88128cc27708236f427803ebe9a4787c710abb`.
+- Embed du footer passé au commit `909a9ac0f3521653bb6c619d84043417934a0086`.
+
+## Prise de rendez-vous : calendrier intégré directement
+- Demande de l'utilisateur : supprimer le formulaire e-mail préalable et afficher directement le calendrier HubSpot.
+- CV Prise de rendez-vous : ancien bloc `.cv-rdv` (formulaire) retiré ; nouveau bloc `480937fc-e51d-9d8c-c352-d49c8c3d467d` (`.cv-rdv`, `data-cv-anim="rdv"`, `data-cv-url` lié à la prop « URL calendrier (JS) ») > carte `.cv-rdv-carte.cv-rdv-carte--calendrier` (`data-cv-calendrier`, 600 px max, 680 px min, sans marge intérieure) > lien de secours « Choisir un créneau » (`.cv-bouton.cv-bouton--secours`, nouvel onglet) affiché seulement sans JS.
+- Prop « URL calendrier (JS) » : valeur par défaut sans `email={email}` ; la prop « URL page de réservation » n'est plus utilisée.
+- cv-site.js : sans formulaire, l'iframe est insérée à 600 px du bloc (chargement différé), avec UTM / gclid / parentHubspotUrl / parentHubspotUtk ; hauteur ajustée par les messages HubSpot. Le mode formulaire reste géré.
