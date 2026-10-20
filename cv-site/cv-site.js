@@ -141,14 +141,14 @@
   /* rdv sans formulaire : calendrier HubSpot intégré directement dans [data-cv-calendrier],
      chargé à l'approche du bloc ; le lien de secours (sans JS) est alors masqué. */
   function calendrier(root, tpl) {
-    var box = $('[data-cv-calendrier]', root) || root, secours = $('a', box);
+    var box = $('[data-cv-calendrier]', root) || $('.cv-rdv-carte', root) || root, secours = $('a', box);
     var url = suivi(tpl.replace(/([?&])email=\{email\}&?/, '$1').replace(/[?&]$/, ''));
     var frame = document.createElement('iframe');
     frame.title = 'Choisir un créneau avec un expert Loan Connect';
     css(frame, { width: '100%', height: '680px', border: '0', display: 'block' });
     hauteur(frame);
     function charger() {
-      if (frame.src) return;
+      if (frame.src || $('iframe', root)) return;
       frame.src = url;
       if (secours) secours.style.display = 'none';
       box.appendChild(frame);
