@@ -121,12 +121,46 @@
     } catch (e) { return href; }
   }
 
-  /* rdv : formulaire e-mail, puis iframe HubSpot (data-cv-url, {email} encodé), UTM transmis. */
+  /* Hauteur envoyée par le calendrier HubSpot (postMessage). */
+  function hauteur(frame) {
+    window.addEventListener('message', function (e) {
+      if (e.source !== frame.contentWindow) return;
+      var h = e.data && (e.data.height || e.data.meetingsHeight);
+      if (h > 200) frame.style.height = h + 'px';
+    });
+  }
+
+  /* rdv sans formulaire : calendrier HubSpot intégré directement dans [data-cv-calendrier],
+     chargé à l'approche du bloc ; le lien de secours (sans JS) est alors masqué. */
+  function calendrier(root, tpl) {
+    var box = $('[data-cv-calendrier]', root) || root, secours = $('a', box);
+    var url = suivi(tpl.replace(/([?&])email=\{email\}&?/, '$1').replace(/[?&]$/, ''));
+    var frame = document.createElement('iframe');
+    frame.title = 'Choisir un créneau avec un expert Loan Connect';
+    css(frame, { width: '100%', height: '680px', border: '0', display: 'block' });
+    hauteur(frame);
+    function charger() {
+      if (frame.src) return;
+      frame.src = url;
+      if (secours) secours.style.display = 'none';
+      box.appendChild(frame);
+    }
+    if (!('IntersectionObserver' in window)) return charger();
+    var io = new IntersectionObserver(function (es) {
+      if (es.some(function (x) { return x.isIntersecting; })) { io.disconnect(); charger(); }
+    }, { rootMargin: '600px 0px' });
+    io.observe(root);
+  }
+
+  /* rdv : formulaire e-mail, puis iframe HubSpot (data-cv-url, {email} encodé), UTM transmis.
+     Sans formulaire dans le bloc : calendrier intégré directement (voir calendrier()). */
   function rdv() {
     anims('rdv').forEach(function (root) {
       var form = $('form', root), input = form && $('input[type="email"]', form), tpl = root.getAttribute('data-cv-url');
-      if (!form || !input || !tpl) return;
+      if (!tpl) return;
       $$('a[href*="/meetings/"]', root).forEach(function (a) { a.href = suivi(a.href); });
+      if (!form) return calendrier(root, tpl);
+      if (!input) return;
       var cal = document.createElement('div'), bar = document.createElement('div'), mail = document.createElement('span');
       var back = document.createElement('button'), frame = document.createElement('iframe');
       css(cal, { display: 'none', flexDirection: 'column', width: '100%', maxWidth: '720px', background: '#fff', borderRadius: '4px', overflow: 'hidden' });
@@ -146,11 +180,7 @@
         form.style.display = 'none'; cal.style.display = 'flex';
       });
       back.addEventListener('click', function () { cal.style.display = 'none'; form.style.display = ''; input.focus(); });
-      window.addEventListener('message', function (e) {
-        if (e.source !== frame.contentWindow) return;
-        var h = e.data && (e.data.height || e.data.meetingsHeight);
-        if (h > 200) frame.style.height = h + 'px';
-      });
+      hauteur(frame);
     });
   }
 

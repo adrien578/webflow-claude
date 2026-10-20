@@ -2,7 +2,7 @@
 
 Script unique des animations des blocs Covalt construits en natif dans Webflow (vanilla JS, sans dépendance).
 
-- Source lisible : `cv-site.js`. Version à publier : `cv-site.min.js` (15,2 Ko, 5,9 Ko gzip, budget 15 Ko).
+- Source lisible : `cv-site.js`. Version à publier : `cv-site.min.js` (15,8 Ko, 6,1 Ko gzip, budget 15 Ko).
 - Régénérer la version minifiée : `npx terser@5 cv-site.js -c -m --comments '/^!/' -o cv-site.min.js`.
 - Sans JS ou avec `prefers-reduced-motion`, la page garde l'état final livré par Webflow.
 
@@ -13,7 +13,7 @@ Script unique des animations des blocs Covalt construits en natif dans Webflow (
 | `reveal` | tout élément | `data-cv-delay` (ms) |
 | `marquee` | CV Logos (`.cv-marquee`) | 1er enfant = piste, son 1er enfant = groupe dupliqué |
 | *(classes)* | FAQ : `.cv-faq-item`, `.cv-faq-question`, `.cv-faq-reponse`, `.cv-faq-icone` | – |
-| `rdv` | CV Prise de rendez-vous | `data-cv-url` (`{email}` remplacé), `form`, `input[type=email]` ; recopie utm_* et gclid de la page (+ parentHubspotUrl / parentHubspotUtk) sur l'iframe et les liens `/meetings/` |
+| `rdv` | CV Prise de rendez-vous | `data-cv-url` ; sans `form` : calendrier chargé à l'approche dans `[data-cv-calendrier]` (lien de secours masqué) ; avec `form` : `{email}` remplacé ; recopie utm_* et gclid de la page (+ parentHubspotUrl / parentHubspotUtk) sur l'iframe et les liens `/meetings/` |
 | `comparateur` | CV Comparateur garanties | `data-cv-scenarios` = `montant\|durée\|secteur\|mois\|fiducie\|garantie1;…` |
 | `process` + `process-ecrans` | CV Process + CV Illustration process | `.cv-process-etape`, `[data-cv-panneau]` |
 | `depot-projet` | CV Illustration dépôt de projet | `.cv-depot-*`, `data-cv-liste`, notification `.cv-notif` dans le même `.cv-aplat` |
