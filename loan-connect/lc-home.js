@@ -1,4 +1,5 @@
-/* Loan Connect Home : UTM, calendrier intégré, popup de choix de profil, popup de rendez-vous.
+/* Loan Connect, pages site (Home, Emprunteur, Conseil) : UTM, calendrier intégré, popups profil et rendez-vous,
+ * animations des illustrations Conseil (dossiers clients, prêteurs correspondants).
  * Remplace l'ancien code de pied de page et le script lcprofillinks. Vanilla JS, sans dépendance.
  *
  * Déclencheurs (même page uniquement, interceptés au capture) :
@@ -232,9 +233,99 @@
     frames.forEach(function (f) { f.src = withParams(f.getAttribute('data-tpl'), true); });
   }
 
+  /* ---------- Animations des illustrations de la page Conseil ---------- */
+  var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function clamp(v) { return Math.max(0, Math.min(1, v)); }
+  function mobile() { return window.innerWidth <= 767; }
+  function visible(el, cb) {
+    if (!('IntersectionObserver' in window)) return cb(true);
+    new IntersectionObserver(function (es) { cb(es[0].isIntersecting); }, { threshold: 0.2 }).observe(el);
+  }
+  css += '@keyframes lcLive{0%{box-shadow:0 0 0 0 rgba(0,122,163,.45)}100%{box-shadow:0 0 0 8px rgba(0,122,163,0)}}'
+    + '.lc-toast-point{animation:lcLive 1.6s infinite}'
+    + '.lc-dc-statut{transition:background-color .4s,border-color .4s,color .4s}'
+    + '.lc-toast{transition:opacity .4s,transform .5s cubic-bezier(.2,0,0,1)}'
+    + '.lc-pc-ligne{transition:opacity .35s,transform .45s cubic-bezier(.2,0,0,1)}'
+    + '.lc-pc-jauge-plein{transition:width .6s cubic-bezier(.2,.7,.2,1)}'
+    + '@media (prefers-reduced-motion:reduce){.lc-toast-point{animation:none}}';
+
+  /* Hero Conseil : statuts des dossiers (data-lc-statuts « ms:Libellé|… ») et toast, boucle de 9 s. */
+  var PASTILLE = {
+    'Brouillon': ['#F5F7F5', '#DCE2DF', '#4A5550'],
+    'En analyse': ['#fff', '#B8D8E6', '#005A78'],
+    'En ligne': ['#EEF6F9', '#B8D8E6', '#005A78']
+  };
+  function dossiers() {
+    $$('[data-lc-anim="dossiers"]').forEach(function (carte) {
+      var zone = carte.closest('section') || document;
+      var toast = zone.querySelector('[data-lc-toast]');
+      var tToast = toast ? +toast.getAttribute('data-lc-toast') || 3800 : 0;
+      var lignes = $$('[data-lc-statuts]', carte).map(function (el) {
+        return { el: el, etapes: el.getAttribute('data-lc-statuts').split('|').map(function (s) { var i = s.indexOf(':'); return [+s.slice(0, i), s.slice(i + 1)]; }) };
+      });
+      var t = 0, enVue = false, survol = false;
+      function rendu() {
+        lignes.forEach(function (l) {
+          var cur = l.etapes.filter(function (e) { return t >= e[0]; }).pop() || l.etapes[0];
+          var p = PASTILLE[cur[1]] || ['#007AA3', '#007AA3', '#fff'];
+          if (l.el.textContent !== cur[1]) l.el.textContent = cur[1];
+          l.el.style.backgroundColor = p[0]; l.el.style.borderColor = p[1]; l.el.style.color = p[2];
+        });
+        if (toast) { var on = t >= tToast; toast.style.opacity = on ? '1' : '0'; toast.style.transform = on ? 'none' : 'translateY(10px)'; }
+      }
+      carte.addEventListener('mouseenter', function () { survol = true; });
+      carte.addEventListener('mouseleave', function () { survol = false; });
+      visible(carte, function (v) { enVue = v; });
+      function fige() { return REDUCE || mobile(); }
+      t = fige() ? 6000 : 0; rendu();
+      setInterval(function () {
+        if (fige()) { if (t !== 6000) { t = 6000; rendu(); } return; }
+        if (!enVue || survol) return;
+        t = (t + 100) % 9000; rendu();
+      }, 100);
+    });
+  }
+
+  /* Process Conseil, écran 3 : compteur, barre et prêteurs, rejoués à chaque affichage de l'écran. */
+  function preteurs() {
+    $$('[data-lc-anim="preteurs"]').forEach(function (bloc) {
+      var panneau = bloc.closest('[data-cv-panneau]') || bloc;
+      var nombre = bloc.querySelector('[data-lc-compte]'), max = nombre ? +nombre.getAttribute('data-lc-compte') || 0 : 0;
+      var barre = bloc.querySelector('.lc-pc-barre-plein');
+      var lignes = $$('.lc-pc-ligne', bloc);
+      var jauges = lignes.map(function (l) { var j = l.querySelector('[data-lc-taux]'); return j; });
+      function etat(t) {
+        var k = clamp((t - 200) / 1600);
+        if (nombre) nombre.textContent = String(Math.round(max * ease(k)));
+        if (barre) barre.style.width = (k * 100).toFixed(1) + '%';
+        lignes.forEach(function (l, i) {
+          var on = t >= 700 + i * 450;
+          l.style.opacity = on ? '1' : '0'; l.style.transform = on ? 'none' : 'translateY(8px)';
+          if (jauges[i]) jauges[i].style.width = (on ? +jauges[i].getAttribute('data-lc-taux') : 0) + '%';
+        });
+      }
+      etat(REDUCE ? 99999 : 0);
+      if (REDUCE) return;
+      var debut = 0, raf = 0;
+      function boucle(now) { var t = now - debut; etat(t); if (t < 3000) raf = requestAnimationFrame(boucle); }
+      function affiche() { return !panneau.classList.contains('cv-pp--cache') && panneau.offsetParent !== null; }
+      var avant = false;
+      function verifie() {
+        var a = affiche();
+        if (a && !avant) { cancelAnimationFrame(raf); etat(0); debut = performance.now(); raf = requestAnimationFrame(boucle); }
+        avant = a;
+      }
+      new MutationObserver(verifie).observe(panneau, { attributes: true, attributeFilter: ['class'] });
+      verifie();
+    });
+  }
+
   /* ---------- Démarrage ---------- */
   function init() {
     var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+    dossiers();
+    preteurs();
     calendriers();
     decorateLinks();
     /* Les déclencheurs s'ouvrent sur place : jamais dans un nouvel onglet. */
