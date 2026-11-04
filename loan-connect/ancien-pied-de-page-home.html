@@ -1,0 +1,131 @@
+<script>
+
+/* Loan Connect Home : UTM, calendrier intégré, modale « Parler à un expert » (repris des LP) + modale de choix de profil (Déposer un projet / Créer un compte). */
+document.addEventListener('DOMContentLoaded', function () {
+  var KEYS = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','gbraid','wbraid'];
+  var params = new URLSearchParams(window.location.search);
+  var fromUrl = KEYS.some(function (k) { return params.get(k); });
+  function readAttr() { if (fromUrl) return null; try { var m = document.cookie.match(/(?:^|;\s*)lc_attr=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : null; } catch (e) { return null; } }
+  var attr = readAttr();
+  function val(k) { return fromUrl ? params.get(k) : (attr && attr[k]); }
+  function withParams(href, embed) {
+    try {
+      var u = new URL(href, window.location.href);
+      KEYS.forEach(function (k) { var v = val(k); if (v) u.searchParams.set(k, v); });
+      if (embed) {
+        u.searchParams.set('embed', 'true'); u.searchParams.delete('email');
+        u.searchParams.set('parentHubspotUrl', window.location.href);
+        var utk = document.cookie.match(/(?:^|;\s*)hubspotutk=([^;]+)/);
+        if (utk) u.searchParams.set('parentHubspotUtk', decodeURIComponent(utk[1]));
+      }
+      return u.toString();
+    } catch (e) { return href; }
+  }
+  function decorateLinks() { document.querySelectorAll('a[href*="connect.covalt.eu"], a[href*="/meetings/"]').forEach(function (a) { a.href = withParams(a.href, false); }); }
+  decorateLinks();
+
+  var frames = [];
+  document.querySelectorAll('[data-cv-anim="rdv"]').forEach(function (root) {
+    var tpl = root.getAttribute('data-cv-url'); if (!tpl) return;
+    var form = root.querySelector('form'); if (form) form.style.display = 'none';
+    var box = document.createElement('div');
+    box.style.cssText = 'width:100%;max-width:720px;background:#fff;border-radius:4px;overflow:hidden';
+    var frame = document.createElement('iframe');
+    frame.title = 'Choisir un créneau avec un expert Loan Connect';
+    frame.style.cssText = 'width:100%;height:680px;border:0;display:block';
+    frame.setAttribute('loading', 'lazy');
+    frame.setAttribute('data-tpl', tpl.replace('{email}', ''));
+    frame.src = withParams(frame.getAttribute('data-tpl'), true);
+    box.appendChild(frame); root.appendChild(box); frames.push(frame);
+    window.addEventListener('message', function (e) { if (e.source !== frame.contentWindow) return; var h = e.data && (e.data.height || e.data.meetingsHeight); if (h > 200) frame.style.height = h + 'px'; });
+  });
+  if (!fromUrl && !attr) { window.addEventListener('load', function () { attr = readAttr(); if (!attr) return; decorateLinks(); frames.forEach(function (f) { f.src = withParams(f.getAttribute('data-tpl'), true); }); }); }
+
+  function lock(on) { document.documentElement.style.overflow = on ? 'hidden' : ''; }
+  function overlay(label) {
+    var m = document.createElement('div');
+    m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', label);
+    m.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(8,20,18,.55);display:none;align-items:center;justify-content:center;padding:16px';
+    m.addEventListener('click', function (e) { if (e.target === m) { m.style.display = 'none'; lock(false); } });
+    document.body.appendChild(m); return m;
+  }
+  function closeBtn(m) {
+    var c = document.createElement('button'); c.type = 'button'; c.setAttribute('aria-label', 'Fermer');
+    c.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+    c.style.cssText = 'position:absolute;top:14px;right:14px;z-index:2;width:40px;height:40px;display:grid;place-items:center;border:1px solid #DCE2DF;border-radius:4px;background:#fff;color:#081412;cursor:pointer';
+    c.addEventListener('click', function () { m.style.display = 'none'; lock(false); }); return c;
+  }
+
+  var rdv, rdvFrame;
+  function ouvrirRdv(href) {
+    if (!rdv) {
+      rdv = overlay('Prendre rendez-vous avec un expert Loan Connect');
+      var p = document.createElement('div');
+      p.style.cssText = 'position:relative;width:100%;max-width:760px;height:min(90vh,760px);background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 24px 64px rgba(8,20,18,.3)';
+      rdvFrame = document.createElement('iframe'); rdvFrame.title = 'Choisir un créneau avec un expert Loan Connect';
+      rdvFrame.style.cssText = 'width:100%;height:100%;border:0;display:block';
+      p.appendChild(closeBtn(rdv)); p.appendChild(rdvFrame); rdv.appendChild(p);
+    }
+    var src = withParams(href, true); if (rdvFrame.getAttribute('src') !== src) rdvFrame.src = src;
+    rdv.style.display = 'flex'; lock(true);
+  }
+
+  var URLS = {
+    projet: { e: 'https://connect.covalt.eu/deposer-un-projet/entreprise', c: 'https://connect.covalt.eu/signup/advisor', t: 'Déposer un projet' },
+    compte: { e: 'https://connect.covalt.eu/signup/entreprise', c: 'https://connect.covalt.eu/signup/advisor', t: 'Créer un compte' }
+  };
+  var PRETEUR = '/loan-connect/preteur';
+  var IC_E = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>';
+  var IC_C = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>';
+  var AR = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  function box(href, ic, titre, sous) {
+    return '<a href="' + href + '" target="_blank" rel="noopener" data-lc-box style="display:flex;align-items:center;gap:16px;padding:20px;border:1px solid #DCE2DF;border-radius:4px;background:#fff;color:#081412;text-decoration:none">' +
+      '<span style="width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:4px;background:#EEF6F9;border:1px solid #B8D8E6;color:#007AA3">' + ic + '</span>' +
+      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:16px;font-weight:500">' + titre + '</span><span style="font-size:13px;line-height:1.45;color:#4A5550">' + sous + '</span></span>' +
+      '<span style="color:#007AA3;display:flex">' + AR + '</span></a>';
+  }
+  var prof, profTitre, profBody;
+  function ouvrirProfil(type) {
+    var u = URLS[type] || URLS.projet;
+    if (!prof) {
+      prof = overlay('Choisir votre profil');
+      var p = document.createElement('div');
+      p.style.cssText = 'position:relative;width:100%;max-width:520px;max-height:100%;overflow:auto;background:#fff;border-radius:4px;box-shadow:0 24px 64px rgba(8,20,18,.3);padding:clamp(22px,5vw,36px);display:flex;flex-direction:column;gap:24px;font-family:inherit';
+      p.appendChild(closeBtn(prof));
+      var head = document.createElement('div'); head.style.cssText = 'display:flex;flex-direction:column;gap:8px;padding-right:40px';
+      profTitre = document.createElement('span'); profTitre.style.cssText = 'font-family:var(--font-mono, monospace);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#007AA3';
+      var h = document.createElement('span'); h.textContent = 'Quel est votre profil ?'; h.style.cssText = 'font-family:"Gerstner Programm FSL","Gerstner Originals",serif;font-size:28px;line-height:1.15;letter-spacing:-.01em;color:#081412';
+      head.appendChild(profTitre); head.appendChild(h); p.appendChild(head);
+      profBody = document.createElement('div'); profBody.style.cssText = 'display:flex;flex-direction:column;gap:12px'; p.appendChild(profBody);
+      var pr = document.createElement('a'); pr.href = PRETEUR;
+      pr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:4px;background:#F5F7F5;font-size:14px;color:#4A5550;text-decoration:none';
+      pr.innerHTML = '<span style="display:flex;flex-wrap:wrap;gap:4px 8px"><span>Vous êtes prêteur ?</span><span style="font-weight:500;color:#005A78">Sourcez de nouveaux dossiers qualifiés</span></span><span style="color:#005A78;display:flex">' + AR + '</span>';
+      p.appendChild(pr); prof.appendChild(p);
+      p.addEventListener('mouseover', function (e) { var b = e.target.closest && e.target.closest('[data-lc-box]'); if (b) { b.style.borderColor = '#007AA3'; b.style.background = '#EEF6F9'; } });
+      p.addEventListener('mouseout', function (e) { var b = e.target.closest && e.target.closest('[data-lc-box]'); if (b) { b.style.borderColor = '#DCE2DF'; b.style.background = '#fff'; } });
+    }
+    profTitre.textContent = u.t;
+    profBody.innerHTML = box(withParams(u.e, false), IC_E, 'Je suis une entreprise', 'Je recherche un financement pour mon projet') + box(withParams(u.c, false), IC_C, 'Je suis un conseil en financement', 'J\'accompagne mes clients dans leur recherche de financement');
+    prof.style.display = 'flex'; lock(true);
+  }
+  document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; [rdv, prof].forEach(function (m) { if (m) m.style.display = 'none'; }); lock(false); });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a') : null; if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    var href = a.getAttribute('href') || '';
+    if (href === '#lc-profil-projet' || href === '#lc-profil-compte') { e.preventDefault(); ouvrirProfil(href === '#lc-profil-compte' ? 'compte' : 'projet'); return; }
+    var cible = '';
+    if (href.indexOf('/meetings/') !== -1 && !a.closest('[role=dialog]')) cible = a.href;
+    else if ((href === '#contact' || href === '#lc-rdv') && frames[0]) cible = frames[0].getAttribute('data-tpl');
+    if (!cible) return;
+    e.preventDefault(); ouvrirRdv(cible);
+  });
+
+  window._hsp = window._hsp || [];
+  window._hsp.push(['addPrivacyConsentListener', function (consent) {
+    if (!consent || !consent.allowed) return;
+    setTimeout(function () { if (!/(?:^|;\s*)hubspotutk=/.test(document.cookie)) return; frames.forEach(function (f) { if (f.src.indexOf('parentHubspotUtk') === -1) f.src = withParams(f.getAttribute('data-tpl'), true); }); }, 800);
+  }]);
+});
+</script>
