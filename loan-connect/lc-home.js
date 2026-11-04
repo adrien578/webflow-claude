@@ -53,13 +53,17 @@
   function samePage(a) {
     return a.origin === location.origin && a.pathname.replace(/\/$/, '') === location.pathname.replace(/\/$/, '');
   }
+  /* Les liens /loan-connect/home#lc-profil-… (footer, header) ouvrent le popup sur la page en cours. */
+  function versHome(a) {
+    return a.origin === location.origin && a.pathname.replace(/\/$/, '') === '/loan-connect/home';
+  }
   function action(a) {
     var h = a.hash || '';
-    if (samePage(a)) {
+    if (samePage(a) || versHome(a)) {
       if (h === '#lc-profil-projet') return 'projet';
       if (h === '#lc-profil-compte') return 'compte';
-      if (h === '#lc-rdv' || h === '#contact') return 'rdv';
     }
+    if (samePage(a) && (h === '#lc-rdv' || h === '#contact')) return 'rdv';
     if (a.href.indexOf('/meetings/') > -1 && !a.closest('.lc-voile')) return 'meetings';
     return '';
   }
@@ -248,7 +252,11 @@
     + '.lc-toast{transition:opacity .4s,transform .5s cubic-bezier(.2,0,0,1)}'
     + '.lc-pc-ligne{transition:opacity .35s,transform .45s cubic-bezier(.2,0,0,1)}'
     + '.lc-pc-jauge-plein{transition:width .6s cubic-bezier(.2,.7,.2,1)}'
-    + '@media (prefers-reduced-motion:reduce){.lc-toast-point{animation:none}}';
+    + '@media (prefers-reduced-motion:reduce){.lc-toast-point{animation:none}}'
+    /* Hero mobile : la notification passe sous la carte, l'aplat s'arrête juste en dessous
+       (la variante Hero de CV Illustration sur aplat réserve 164 px pour la notification superposée du desktop). */
+    + '@media (max-width:767px){.cv-section--hero .cv-aplat.w-variant-b53a93c6-8d72-6000-5dc7-bf7bb35a3966{padding-bottom:24px}'
+    + '.cv-section--hero .cv-aplat-carte.w-variant-b53a93c6-8d72-6000-5dc7-bf7bb35a3966{min-height:0}}';
 
   /* Hero Conseil : statuts des dossiers (data-lc-statuts « ms:Libellé|… ») et toast, boucle de 9 s. */
   var PASTILLE = {
