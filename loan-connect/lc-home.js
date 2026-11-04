@@ -239,6 +239,8 @@
     decorateLinks();
     /* Les déclencheurs s'ouvrent sur place : jamais dans un nouvel onglet. */
     $$('a[href*="#lc-"], a[href*="#contact"], a[href*="/meetings/"]').forEach(function (a) { if (action(a)) a.removeAttribute('target'); });
+    /* CTA d'inscription de la page : même onglet (le composant RDV partagé avec les LP impose _blank). */
+    $$('a[href*="connect.covalt.eu"]').forEach(function (a) { a.removeAttribute('target'); });
 
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('a');
