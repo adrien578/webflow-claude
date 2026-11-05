@@ -355,6 +355,8 @@
     el.style.color = on ? FONCE : 'var(--_covalt-tokens---cv-texte-secondaire, #4A5550)';
   }
   function petitMobile() { return window.innerWidth <= 760; }
+  /* Polices dans un attribut style="…" : guillemets simples. */
+  var MONO_A = MONO.replace(/"/g, "'"), TITRES_A = TITRES.replace(/"/g, "'");
 
   css += '.lc-pr-logo{display:block;height:24px;width:auto;margin:0 0 28px}'
     /* Hero */
@@ -458,6 +460,7 @@
     + '[data-lc-rdv-email]{background:transparent!important;box-shadow:none!important;border:0!important;padding:0!important}'
     + '.lc-pr-epingle .lc-pr-process-grille{padding:40px 32px}@media (max-width:760px){.lc-pr-epingle .lc-pr-process-grille{padding:16px 20px}}'
     + '.lc-pr-sp-lien:hover{color:#fff;text-decoration-color:#fff}'
+    + '#faq .cv-faq-question{text-decoration:none;color:inherit}'
     + '@media (prefers-reduced-motion:reduce){.lc-pr-pt{animation:none}.lc-in{animation:none}}';
 
   /* Logo Loan Connect au-dessus du titre du hero (24 px), page Prêteur uniquement. */
@@ -605,7 +608,7 @@
   var ECRANS = [
     function (mini) {
       var h = mini
-        ? '<div class="lc-pm"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span class="lc-ph-mono">TICKET CIBLE</span><span style="font-family:' + MONO + ';font-size:12px;color:#005A78">500 k€ – <span data-tk>1 M€</span></span></div>'
+        ? '<div class="lc-pm"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span class="lc-ph-mono">TICKET CIBLE</span><span style="font-family:' + MONO_A + ';font-size:12px;color:#005A78">500 k€ – <span data-tk>1 M€</span></span></div>'
           + '<div style="position:relative;height:4px;background:#fff"><div class="lc-pe-plein" data-tkw></div></div>'
           + '<div class="lc-pe-chips" style="gap:6px">' + SECT.map(function (s) { return '<span class="lc-pe-chip" data-sect>' + s + '</span>'; }).join('') + '</div></div>'
         : '<div class="lc-pe lc-in"><div class="lc-pe-tete"><span class="lc-pe-titre">Votre profil investisseur</span><span class="lc-ph-mono">ÉTAPE 1/3</span></div><div class="lc-pe-corps">'
@@ -627,12 +630,12 @@
     function (mini) {
       var h = mini
         ? '<div class="lc-pm">' + DEALS.slice(0, 2).map(function (d) {
-          return '<div class="lc-pm-dossier lc-in" data-at="' + d.at + '"><span style="display:flex;flex-direction:column;gap:4px;min-width:0"><span style="font-family:' + MONO + ';font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + d.m + '</span>'
+          return '<div class="lc-pm-dossier lc-in" data-at="' + d.at + '"><span style="display:flex;flex-direction:column;gap:4px;min-width:0"><span style="font-family:' + MONO_A + ';font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + d.m + '</span>'
             + '<span class="lc-pe-gar" style="opacity:0">Garanties recommandées</span></span>' + docs(3, true) + '</div>';
         }).join('') + '</div>'
         : '<div class="lc-pe lc-in"><div class="lc-pe-tete"><span class="lc-pe-titre">Dossiers pour votre profil</span><span class="lc-pe-pastille"><span class="lc-pr-pt"></span><span data-cnt>0 nouveau</span></span></div><div style="display:flex;flex-direction:column;padding:6px 0">'
           + DEALS.map(function (d) {
-            return '<div class="lc-pe-dossier lc-in" data-at="' + d.at + '"><div class="lc-pe-ico">' + ic(18, I_DOC) + '</div><div style="display:flex;flex-direction:column;gap:7px;min-width:0"><span style="display:block;width:' + d.w + ';height:8px;background:#DCE2DF;border-radius:2px"></span><span style="font-family:' + MONO + ';font-size:12px;color:#4A5550">' + d.m + '</span></div>'
+            return '<div class="lc-pe-dossier lc-in" data-at="' + d.at + '"><div class="lc-pe-ico">' + ic(18, I_DOC) + '</div><div style="display:flex;flex-direction:column;gap:7px;min-width:0"><span style="display:block;width:' + d.w + ';height:8px;background:#DCE2DF;border-radius:2px"></span><span style="font-family:' + MONO_A + ';font-size:12px;color:#4A5550">' + d.m + '</span></div>'
               + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' + docs(3) + '<span class="lc-pe-gar" style="opacity:0">Garanties recommandées</span></div></div>';
           }).join('') + '</div><div class="lc-pe-pied"><span style="width:10px;height:10px;border-radius:2px;background:#007AA3"></span>Mémorandum · Prévisionnel · Juridique</div></div>';
       return { html: h, maj: function (box, st) {
@@ -769,11 +772,11 @@
     form.className = 'lc-pr-rdv'; form.noValidate = false;
     form.innerHTML = '<div aria-hidden="true" class="lc-pr-mcal"><div style="display:flex;flex-direction:column;gap:8px">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:500"><span>Octobre</span><span style="display:flex;gap:6px;color:#005A78">' + ic(12, '<path d="m15 18-6-6 6-6"/>') + ic(12, '<path d="m9 18 6-6-6-6"/>') + '</span></div>'
-      + '<div class="lc-pr-mcal-j" style="font-family:' + MONO + ';font-size:9px;color:#7A8682"><b style="font-weight:400">L</b><b style="font-weight:400">M</b><b style="font-weight:400">M</b><b style="font-weight:400">J</b><b style="font-weight:400">V</b></div>'
+      + '<div class="lc-pr-mcal-j" style="font-family:' + MONO_A + ';font-size:9px;color:#7A8682"><b style="font-weight:400">L</b><b style="font-weight:400">M</b><b style="font-weight:400">M</b><b style="font-weight:400">J</b><b style="font-weight:400">V</b></div>'
       + '<div class="lc-pr-mcal-j">' + J.map(function (j) { return '<span class="' + (j[1] ? 'lc-' + j[1] : '') + '">' + j[0] + '</span>'; }).join('') + '</div></div>'
       + '<div class="lc-pr-mcal-h"><span style="border:0;background:none;padding:0;text-align:left;font-size:11px;font-weight:500;color:#081412">Mar. 21</span><span>09:30</span><span class="lc-s">10:00</span><span>14:30</span></div></div>'
-      + '<div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:' + MONO + ';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#005A78">Prise de rendez-vous · 30 min</span>'
-      + '<span style="font-family:' + TITRES + ';font-size:30px;line-height:1.1;letter-spacing:-.02em">Rencontrons-nous</span>'
+      + '<div style="display:flex;flex-direction:column;gap:10px"><span style="font-family:' + MONO_A + ';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#005A78">Prise de rendez-vous · 30 min</span>'
+      + '<span style="font-family:' + TITRES_A + ';font-size:30px;line-height:1.1;letter-spacing:-.02em">Rencontrons-nous</span>'
       + '<span style="font-size:15px;line-height:1.55;color:#4A5550">Indiquez votre e-mail professionnel, puis choisissez un créneau avec un expert Loan Connect.</span></div>'
       + '<label>Adresse e-mail professionnelle<input type="email" name="email" required autocomplete="email" placeholder="prenom.nom@societe.fr"></label>'
       + '<button type="submit">Choisir un créneau ' + fleche(16) + '</button>';
@@ -801,6 +804,8 @@
   function preteur() {
     if (!document.querySelector('[data-lc-anim^="pr-"]')) return;
     prLogo(); prHero(); prEntonnoir(); prProcess(); prComparateur();
+    /* Navigation : « Prêteurs » actif (lien URL du header partagé). */
+    $$('.lc-site-nav-lien, .lc-site-menu-lien').forEach(function (a) { if (samePage(a)) { a.classList.add('w--current'); a.setAttribute('aria-current', 'page'); } });
     $$('.lc-pr-sp-lien').forEach(function (a) { if (!a.querySelector('svg')) a.insertAdjacentHTML('beforeend', ic(16, '<path d="M5 12h14M13 6l6 6-6 6"/>')); });
   }
 
