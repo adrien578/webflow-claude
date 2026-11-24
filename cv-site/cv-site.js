@@ -1,7 +1,7 @@
 /*! cv-site.js — animations des blocs Covalt (Webflow natif). Vanilla JS, sans dépendance.
  * Chaque bloc s'active via data-cv-anim : reveal, marquee, faq, rdv, comparateur, process, depot-projet.
  * Témoignages : chaque section .cv-tq (CV Témoignages) est initialisée seule.
- * Guides pratiques : guide (modèle /guide/…), guide-logos.
+ * Guides pratiques : guide (modèle /guide/…), guide-logos, guides (page liste : filtres, recherche).
  * Sans JS ou avec prefers-reduced-motion, la page garde l'état final statique livré par Webflow.
  */
 (function () {
@@ -707,6 +707,54 @@
     $$('[data-cv-guide-autres]').forEach(guideAutres);
   }
 
-  function init() { guide(); reveal(); marquee(); faq(); rdv(); comparateur(); process(); depot(); temoignages(); }
+
+  /* guides (page liste, section data-cv-anim="guides") : filtre par thème ([data-cv-guides-theme], correspondance exacte,
+     vide = Tous), recherche ([data-cv-guides-search]) sur le nom et la description, sans casse ni accents, à chaque frappe ;
+     compteurs calculés sur tous les guides, à la une compris ; titre [data-cv-guides-titre] (« Tous nos guides », « 1 guide »,
+     « N guides ») ; état vide [data-cv-guides-vide] ; [data-cv-guides-reset] remet Tous et vide la recherche.
+     Cartes : [data-cv-guide] avec data-cv-theme et data-cv-slug (CMS). Le guide à la une (liste [data-cv-guides-une]) est
+     masqué en CSS (aucun doublon sans JS) et ne réapparaît dans la grille que si un filtre ou une recherche est actif. */
+  function norm(s) {
+    s = String(s || '');
+    if (s.normalize) s = s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return s.toLowerCase().replace(/[’']/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function guides() {
+    anims('guides').forEach(function (sec) {
+      var puces = $$('[data-cv-guides-theme]', sec), champ = $('[data-cv-guides-search]', sec);
+      var titre = $('[data-cv-guides-titre]', sec), vide = $('[data-cv-guides-vide]', sec), theme = '', q = '';
+      var cartes = $$('[data-cv-guide]', sec).map(function (c) {
+        var nom = $('.cv-gl-carte-nom', c), desc = $('.cv-gl-carte-desc', c), ds = (c.getAttribute('data-cv-slug') || '').trim();
+        if (ds && !/\/guide\/[^#?]/.test(c.getAttribute('href') || '')) c.setAttribute('href', '/guide/' + ds);
+        return {
+          el: c.closest('.w-dyn-item') || c, theme: (c.getAttribute('data-cv-theme') || '').trim(),
+          txt: norm((nom ? nom.textContent : '') + ' ' + (desc ? desc.textContent : '')), une: !!c.closest('[data-cv-guides-une]')
+        };
+      });
+      function rendu() {
+        var actif = !!(theme || q), n = 0;
+        cartes.forEach(function (c) {
+          var ok = (!theme || c.theme === theme) && (!q || c.txt.indexOf(q) >= 0) && (actif || !c.une);
+          c.el.style.display = ok ? 'block' : 'none';
+          if (ok) n++;
+        });
+        puces.forEach(function (p) { p.setAttribute('aria-pressed', p.getAttribute('data-cv-guides-theme') === theme ? 'true' : 'false'); });
+        txt(titre, !actif ? 'Tous nos guides' : n === 1 ? '1 guide' : n + ' guides');
+        if (vide) vide.classList.toggle('cv-gl-vide-on', n === 0);
+      }
+      puces.forEach(function (p) {
+        var t = p.getAttribute('data-cv-guides-theme') || '';
+        txt($('.cv-gl-puce-n', p), String(t ? cartes.filter(function (c) { return c.theme === t; }).length : cartes.length));
+        p.addEventListener('click', function () { theme = t; rendu(); });
+      });
+      if (champ) champ.addEventListener('input', function () { q = norm(champ.value); rendu(); });
+      $$('[data-cv-guides-reset]', sec).forEach(function (b) {
+        b.addEventListener('click', function () { theme = ''; q = ''; if (champ) champ.value = ''; rendu(); });
+      });
+      rendu();
+    });
+  }
+
+  function init() { guide(); guides(); reveal(); marquee(); faq(); rdv(); comparateur(); process(); depot(); temoignages(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
