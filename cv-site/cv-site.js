@@ -671,8 +671,11 @@
   }
   function guideAutres(list) {
     var cur = location.pathname.replace(/\/$/, '').split('/').pop().toLowerCase(), n = 0;
-    $$('a[href*="/guide/"]', list).forEach(function (a) {
-      var it = a.closest('.w-dyn-item') || a, slug = a.getAttribute('href').replace(/\/$/, '').split('/').pop().toLowerCase();
+    $$('a[data-cv-slug], a[href*="/guide/"]', list).forEach(function (a) {
+      var ds = (a.getAttribute('data-cv-slug') || '').trim(), h = a.getAttribute('href') || '';
+      // Lien « guide courant » non réglé dans Webflow : on le reconstruit à partir du slug CMS.
+      if (ds && (!h || h === '#')) a.setAttribute('href', '/guide/' + ds);
+      var it = a.closest('.w-dyn-item') || a, slug = (ds || a.getAttribute('href').replace(/\/$/, '').split('/').pop()).toLowerCase();
       var garde = slug !== cur && n < 3;
       if (garde) n++;
       it.style.display = garde ? 'block' : 'none';
