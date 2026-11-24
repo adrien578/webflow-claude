@@ -569,7 +569,7 @@
      - formulaire [data-cv-hs-form] : envoi au formulaire HubSpot du guide (API Forms v3) avec le cookie hubspotutk,
        l'URL (UTM comprises) et le titre de la page, comme l'iframe HubSpot ; question « fiduciaire » si
        data-cv-fidu="Oui" (champ CMS Question fiduciaire) ; succès sur place (role=status) ;
-     - lien [data-cv-extrait] : affiché seulement si l'URL de l'extrait est renseignée ;
+     - lien [data-cv-extrait] : affiché seulement si l'URL de l'extrait est renseignée ; ouvre l'aperçu en popup ;
      - logos [data-cv-anim="guide-logos"] : rangée fixe, défilement 32 s sous 767 px (pause survol / toucher) ;
      - « Autres guides » [data-cv-guide-autres] : 3 cartes, jamais le guide courant ;
      - fil d'Ariane : JSON-LD BreadcrumbList. */
@@ -692,6 +692,166 @@
       { '@type': 'ListItem', position: 3, name: h.textContent.trim(), item: o + location.pathname }] });
     document.head.appendChild(s);
   }
+
+  /* Aperçu de l'extrait (modèle de guide) : un clic sur [data-cv-extrait] ouvre une popup qui affiche l'extrait sur la page.
+     PDF (même mal nommé, ex. .png) : pdf.js (cdnjs, chargé au premier clic), lecture par morceaux (le PDF n'est pas téléchargé en entier), pages dessinées
+     à l'approche dans la zone de lecture. Image (.png, .jpg…) : affichée telle quelle. Fermeture : croix, voile, Échap ;
+     « Recevoir le guide complet » ferme la popup et descend au formulaire. Sans JS : l'extrait s'ouvre dans un nouvel onglet. */
+  var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/', mdStyle = false;
+  function chargerPdfjs() {
+    if (chargerPdfjs.p) return chargerPdfjs.p;
+    chargerPdfjs.p = new Promise(function (ok, ko) {
+      function pret() {
+        var lib = window.pdfjsLib;
+        if (!lib) return ko(new Error('pdfjs'));
+        if (!lib.GlobalWorkerOptions.workerSrc) lib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+        ok(lib);
+      }
+      if (window.pdfjsLib) { pret(); return; }
+      var s = document.createElement('script');
+      s.src = PDFJS + 'pdf.min.js'; s.async = true; s.onload = pret; s.onerror = function () { ko(new Error('pdfjs')); };
+      document.head.appendChild(s);
+    });
+    chargerPdfjs.p.catch(function () { chargerPdfjs.p = null; });
+    return chargerPdfjs.p;
+  }
+  function mdCss() {
+    if (mdStyle) return; mdStyle = true;
+    var s = document.createElement('style');
+    s.textContent = '.cv-gd-modal{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:24px}'
+      + '.cv-gd-modal.cv-gd-modal-on{display:flex}'
+      + '.cv-gd-modal-voile{position:absolute;inset:0;background:rgba(8,20,18,.62)}'
+      + '.cv-gd-modal-panneau{position:relative;display:flex;flex-direction:column;width:min(920px,100%);height:min(calc(100dvh - 48px),1100px);background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 32px 64px -24px rgba(8,20,18,.45);font-family:Inter,sans-serif;color:#081412}'
+      + '.cv-gd-modal-on .cv-gd-modal-panneau{animation:cvGdBump 500ms cubic-bezier(.3,0,0,1) both}'
+      + '.cv-gd-modal-tete{display:flex;align-items:center;gap:16px;padding:12px 12px 12px 20px;border-bottom:1px solid #DCE2DF}'
+      + '.cv-gd-modal-titre{flex:1;min-width:0;margin:0;font-family:"Gerstner Programm",Tahoma,sans-serif;font-size:18px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+      + '.cv-gd-modal-compteur{flex:none;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.04em;color:rgba(8,20,18,.40)}'
+      + '.cv-gd-modal-fermer{flex:none;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:4px;background:transparent;color:#081412;cursor:pointer}'
+      + '.cv-gd-modal-fermer:hover{background:#F5F7F5}'
+      + '.cv-gd-modal-fermer:focus-visible,.cv-gd-modal-pied a:focus-visible{outline:2px solid #24826B;outline-offset:2px}'
+      + '.cv-gd-modal-corps{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#F5F7F5;padding:24px;outline:none}'
+      + '.cv-gd-modal-liste{display:flex;flex-direction:column;align-items:center;gap:16px}'
+      + '.cv-gd-modal-page{position:relative;width:100%;max-width:820px;background:#fff;box-shadow:0 0 0 1px rgba(8,20,18,.06),0 8px 24px -12px rgba(8,20,18,.25)}'
+      + '.cv-gd-modal-page canvas,.cv-gd-modal-page img{display:block;width:100%;height:auto}'
+      + '.cv-gd-modal-etat{margin:48px auto;max-width:44ch;text-align:center;font-size:14px;line-height:1.55;color:rgba(8,20,18,.62)}'
+      + '.cv-gd-modal-etat a{color:#24826B;font-weight:500;text-decoration:underline;text-underline-offset:3px}'
+      + '.cv-gd-modal-pied{display:flex;justify-content:flex-end;align-items:center;gap:16px;padding:12px 20px;border-top:1px solid #DCE2DF;background:#fff}'
+      + '.cv-gd-modal-pied a{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 22px;border-radius:4px;background:#24826B;color:#fff;font-size:15px;font-weight:500;text-decoration:none;transition:background-color 200ms}'
+      + '.cv-gd-modal-pied a:hover{background:#1E6E5A;color:#fff}'
+      + '@media (max-width:767px){.cv-gd-modal{padding:0}.cv-gd-modal-panneau{width:100%;height:100%;border-radius:0}.cv-gd-modal-corps{padding:12px}.cv-gd-modal-pied a{flex:1}}'
+      + '@media (prefers-reduced-motion:reduce){.cv-gd-modal-on .cv-gd-modal-panneau{animation:none}}';
+    document.head.appendChild(s);
+  }
+  var md = null;
+  function modale() {
+    if (md) return md;
+    mdCss();
+    var el = document.createElement('div');
+    el.className = 'cv-gd-modal';
+    el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'cv-gd-modal-titre');
+    el.innerHTML = '<div class="cv-gd-modal-voile"></div><div class="cv-gd-modal-panneau">'
+      + '<div class="cv-gd-modal-tete"><p class="cv-gd-modal-titre" id="cv-gd-modal-titre"></p><span class="cv-gd-modal-compteur" aria-hidden="true"></span>'
+      + '<button type="button" class="cv-gd-modal-fermer" aria-label="Fermer l\'aperçu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>'
+      + '<div class="cv-gd-modal-corps" tabindex="0" aria-label="Extrait du guide"><div class="cv-gd-modal-liste"></div></div>'
+      + '<div class="cv-gd-modal-pied"><a href="#recevoir-le-guide">Recevoir le guide complet<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></a></div></div>';
+    document.body.appendChild(el);
+    md = { el: el, corps: $('.cv-gd-modal-corps', el), liste: $('.cv-gd-modal-liste', el), titre: $('.cv-gd-modal-titre', el),
+      cpt: $('.cv-gd-modal-compteur', el), url: '', retour: null, io: null, overflow: '' };
+    function fermer() {
+      if (!el.classList.contains('cv-gd-modal-on')) return;
+      el.classList.remove('cv-gd-modal-on');
+      document.documentElement.style.overflow = md.overflow;
+      if (md.retour) md.retour.focus();
+    }
+    md.fermer = fermer;
+    $('.cv-gd-modal-voile', el).addEventListener('click', fermer);
+    $('.cv-gd-modal-fermer', el).addEventListener('click', fermer);
+    $('.cv-gd-modal-pied a', el).addEventListener('click', function () { md.retour = null; fermer(); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); fermer(); return; }
+      if (e.key !== 'Tab') return;
+      var f = $$('button, a[href], [tabindex="0"]', el).filter(function (x) { return x.getClientRects().length; });
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    });
+    md.corps.addEventListener('scroll', function () { compteur(); }, { passive: true });
+    return md;
+  }
+  function compteur() {
+    var pages = $$('.cv-gd-modal-page', md.liste);
+    if (pages.length < 2) { txt(md.cpt, ''); return; }
+    var haut = md.corps.getBoundingClientRect().top + md.corps.clientHeight * 0.4, k = 0;
+    pages.forEach(function (p, i) { if (p.getBoundingClientRect().top <= haut) k = i; });
+    txt(md.cpt, (k + 1) + ' / ' + pages.length);
+  }
+  function etat(html) { md.liste.innerHTML = '<p class="cv-gd-modal-etat">' + html + '</p>'; }
+  function ouvrirExtrait(url, nom, lien) {
+    var m = modale();
+    m.retour = lien;
+    txt(m.titre, 'Extrait · ' + nom);
+    m.overflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
+    m.el.classList.add('cv-gd-modal-on');
+    $('.cv-gd-modal-fermer', m.el).focus();
+    if (m.url === url) return;
+    m.url = url; txt(m.cpt, ''); m.corps.scrollTop = 0;
+    if (m.io) { m.io.disconnect(); m.io = null; }
+    var secours = 'L\'aperçu n\'a pas pu s\'afficher. <a href="' + url.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">Ouvrir l\'extrait dans un nouvel onglet</a>';
+    // Image : si l'extrait n'est pas un PDF lisible (certains PDF sont nommés .png, d'où l'essai PDF d'abord).
+    function image() {
+      var img = new Image();
+      img.alt = 'Extrait du guide ' + nom; img.decoding = 'async';
+      img.onload = function () { if (m.url !== url) return; m.liste.innerHTML = ''; var d = document.createElement('div'); d.className = 'cv-gd-modal-page'; d.appendChild(img); m.liste.appendChild(d); };
+      img.onerror = function () { if (m.url === url) { m.url = ''; etat(secours); } };
+      img.src = url;
+    }
+    etat('Chargement de l\'extrait…');
+    if (/\.(jpe?g|webp|gif|avif)(\?|#|$)/i.test(url)) { image(); return; }
+    chargerPdfjs().then(function (lib) {
+      var tache = lib.getDocument({ url: url, disableAutoFetch: true, disableStream: true, rangeChunkSize: 262144 });
+      tache.onProgress = function (pr) {
+        if (m.url !== url || !pr.total) return;
+        var e = $('.cv-gd-modal-etat', m.liste);
+        if (e) txt(e, 'Chargement de l\'extrait… ' + Math.min(99, Math.round(pr.loaded / pr.total * 100)) + ' %');
+      };
+      return tache.promise;
+    }).then(function (doc) {
+      if (m.url !== url) return;
+      return doc.getPage(1).then(function (p1) {
+        var v = p1.getViewport({ scale: 1 }), ratio = v.width + ' / ' + v.height;
+        m.liste.innerHTML = '';
+        var pages = [];
+        for (var k = 1; k <= doc.numPages; k++) {
+          var d = document.createElement('div');
+          d.className = 'cv-gd-modal-page'; d.style.aspectRatio = ratio;
+          d.setAttribute('role', 'img'); d.setAttribute('aria-label', 'Page ' + k + ' sur ' + doc.numPages);
+          d.setAttribute('data-page', k);
+          m.liste.appendChild(d); pages.push(d);
+        }
+        compteur();
+        function dessiner(d) {
+          if (d.hasAttribute('data-ok')) return;
+          d.setAttribute('data-ok', '');
+          doc.getPage(+d.getAttribute('data-page')).then(function (p) {
+            var base = p.getViewport({ scale: 1 }), dpr = Math.min(window.devicePixelRatio || 1, 2);
+            var vp = p.getViewport({ scale: Math.max(d.clientWidth, 320) * dpr / base.width });
+            var c = document.createElement('canvas');
+            c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+            d.style.aspectRatio = base.width + ' / ' + base.height;
+            return p.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () { d.appendChild(c); });
+          }).catch(function () { d.removeAttribute('data-ok'); });
+        }
+        if ('IntersectionObserver' in window) {
+          m.io = new IntersectionObserver(function (es) {
+            es.forEach(function (e) { if (e.isIntersecting) { dessiner(e.target); m.io.unobserve(e.target); } });
+          }, { root: m.corps, rootMargin: '600px 0px' });
+          pages.forEach(function (d) { m.io.observe(d); });
+        } else pages.forEach(dessiner);
+      });
+    }).catch(function () { if (m.url === url) image(); });
+  }
+
   function guide() {
     var secs = anims('guide');
     if (secs.length || $('[data-cv-anim="guides"]')) headerOffset();
@@ -700,7 +860,14 @@
       $$('[data-cv-hs-form]').forEach(guideForm);
       $$('[data-cv-extrait]').forEach(function (a) {
         var u = (a.getAttribute('data-cv-extrait') || '').trim();
-        if (/^https?:\/\//.test(u)) { a.href = u; a.classList.add('cv-gd-extrait-on'); }
+        if (!/^https?:\/\//.test(u)) return;
+        a.href = u; a.classList.add('cv-gd-extrait-on'); a.setAttribute('aria-haspopup', 'dialog');
+        a.addEventListener('click', function (e) {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+          e.preventDefault();
+          var h = $('h1', sec);
+          ouvrirExtrait(u, h ? h.textContent.trim() : 'Guide pratique', a);
+        });
       });
     });
     anims('guide-logos').forEach(guideLogos);
