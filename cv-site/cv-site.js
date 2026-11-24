@@ -1,6 +1,7 @@
 /*! cv-site.js — animations des blocs Covalt (Webflow natif). Vanilla JS, sans dépendance.
  * Chaque bloc s'active via data-cv-anim : reveal, marquee, faq, rdv, comparateur, process, depot-projet.
  * Témoignages : chaque section .cv-tq (CV Témoignages) est initialisée seule.
+ * Guides pratiques : guide (modèle /guide/…), guide-logos.
  * Sans JS ou avec prefers-reduced-motion, la page garde l'état final statique livré par Webflow.
  */
 (function () {
@@ -561,6 +562,144 @@
     });
   }
 
-  function init() { reveal(); marquee(); faq(); rdv(); comparateur(); process(); depot(); temoignages(); }
+
+  /* guide (modèle /guide/{slug}, section data-cv-anim="guide") :
+     - --cv-hd = hauteur réelle du header fixe (.navbar), pour caler la page et la barre de filtres dessous ;
+     - formulaire [data-cv-hs-form] : envoi au formulaire HubSpot du guide (API Forms v3) avec le cookie hubspotutk,
+       l'URL (UTM comprises) et le titre de la page, comme l'iframe HubSpot ; question « fiduciaire » si
+       .cv-gd-fidu-marque est visible (champ CMS Question fiduciaire) ; succès sur place (role=status) ;
+     - lien [data-cv-extrait] : affiché seulement si l'URL de l'extrait est renseignée ;
+     - logos [data-cv-anim="guide-logos"] : rangée fixe, défilement 32 s sous 767 px (pause survol / toucher) ;
+     - « Autres guides » [data-cv-guide-autres] : 3 cartes, jamais le guide courant ;
+     - fil d'Ariane : JSON-LD BreadcrumbList. */
+  var HS_API = 'https://api-eu1.hsforms.com/submissions/v3/integration/submit/139790115/';
+  var FIDU = [['fiduciaire_actif', 'Oui, je suis déjà fiduciaire'], ['non_mais_interesse', 'Je réfléchis à le devenir à terme'],
+    ['non_pas_interesse', 'Non, et je ne souhaite pas le devenir pour l\'instant'], ['non_connait_pas_fiducie', 'Je me renseigne sur la fiducie']];
+  function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
+  function visible(el) { return el && el.getClientRects().length > 0; }
+  function headerOffset() {
+    var nav = $('.navbar'), root = document.documentElement;
+    if (!nav) return;
+    function maj() { root.style.setProperty('--cv-hd', Math.round(nav.getBoundingClientRect().height) + 'px'); }
+    maj(); addEventListener('resize', maj); addEventListener('load', maj);
+    if (window.ResizeObserver) new ResizeObserver(maj).observe(nav);
+  }
+  function guideForm(root) {
+    var id = (root.getAttribute('data-cv-hs-form') || '').trim(), form = $('form', root), ok = $('.cv-gd-succes', root);
+    if (!form || !ok || !id) return;
+    var envoi = $('.cv-gd-envoyer', form), err = $('.cv-gd-erreur-envoi', form);
+    if (visible($('.cv-gd-fidu-marque', root))) {
+      var fs = document.createElement('fieldset');
+      fs.className = 'cv-gd-champ cv-gd-radios';
+      fs.setAttribute('data-requis', 'radio');
+      fs.innerHTML = '<legend>Êtes-vous fiduciaire ?</legend>' + FIDU.map(function (o) {
+        return '<label><input type="radio" name="statut_fiduciaire" value="' + o[0] + '"><span>' + o[1] + '</span></label>';
+      }).join('') + '<span class="cv-gd-erreur" aria-live="polite"></span>';
+      envoi.parentNode.insertBefore(fs, envoi);
+    }
+    function erreur(ch, msg) {
+      var e = $('.cv-gd-erreur', ch), i = $('input,select', ch);
+      if (e) e.textContent = msg || '';
+      ch.classList.toggle('cv-gd-invalide', !!msg);
+      if (i && i.type !== 'radio') i.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    }
+    function valide(ch) {
+      var t = ch.getAttribute('data-requis'), i = $('input,select', ch), v = i && i.value.trim();
+      if (t === 'radio') return $('input:checked', ch) ? '' : 'Choisissez une réponse.';
+      if (!v) return 'Champ obligatoire.';
+      if (t === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'Adresse e-mail invalide.';
+      return '';
+    }
+    $$('[data-requis]', form).forEach(function (ch) {
+      ch.addEventListener('change', function () { if (ch.classList.contains('cv-gd-invalide')) erreur(ch, valide(ch)); });
+      ch.addEventListener('input', function () { if (ch.classList.contains('cv-gd-invalide')) erreur(ch, valide(ch)); });
+    });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var premier = null;
+      $$('[data-requis]', form).forEach(function (ch) { var m = valide(ch); erreur(ch, m); if (m && !premier) premier = ch; });
+      if (premier) { var f = $('input,select', premier); if (f) f.focus(); return; }
+      var champs = [];
+      $$('input,select', form).forEach(function (i) {
+        if (!i.name || (i.type === 'radio' && !i.checked) || i.value.trim() === '') return;
+        champs.push({ objectTypeId: '0-1', name: i.name, value: i.value.trim() });
+      });
+      var ctx = { pageUri: location.href, pageName: document.title }, hutk = cookie('hubspotutk');
+      if (hutk) ctx.hutk = hutk;
+      envoi.disabled = true; envoi.setAttribute('aria-busy', 'true'); txt(err, '');
+      fetch(HS_API + id, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: champs, context: ctx }) })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); })
+        .then(function () {
+          form.hidden = true; ok.hidden = false;
+          if (!REDUCE) ok.style.animation = 'cvGdBump 500ms cubic-bezier(.3,0,0,1) both';
+          var t = $('.cv-gd-succes-titre', ok); if (t) { t.setAttribute('tabindex', '-1'); t.focus(); }
+        })
+        .catch(function () { txt(err, 'L\'envoi n\'a pas abouti. Vérifiez votre connexion et réessayez.'); })
+        .then(function () { envoi.disabled = false; envoi.removeAttribute('aria-busy'); });
+    });
+    var autre = $('.cv-gd-autre', ok);
+    if (autre) autre.addEventListener('click', function () {
+      form.reset(); ok.hidden = true; ok.style.animation = ''; form.hidden = false;
+      var f = $('input', form); if (f) f.focus();
+    });
+  }
+  function guideLogos(root) {
+    var track = root.firstElementChild, group = track && track.firstElementChild;
+    if (REDUCE || !group || !track.animate || !window.matchMedia) return;
+    var mq = matchMedia('(max-width: 767px)'), copy = null, a = null;
+    function maj() {
+      if (mq.matches && !a) {
+        copy = group.cloneNode(true); copy.setAttribute('aria-hidden', 'true');
+        $$('img', copy).forEach(function (i) { i.alt = ''; });
+        track.appendChild(copy); root.classList.add('cv-gd-defile');
+        a = track.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }], { duration: 32000, iterations: Infinity });
+      } else if (!mq.matches && a) {
+        a.cancel(); a = null; track.removeChild(copy); copy = null; root.classList.remove('cv-gd-defile');
+      }
+    }
+    function pause() { if (a) a.pause(); }
+    function lecture() { if (a) a.play(); }
+    root.addEventListener('mouseenter', pause); root.addEventListener('mouseleave', lecture);
+    root.addEventListener('touchstart', pause, { passive: true }); root.addEventListener('touchend', lecture, { passive: true });
+    root.addEventListener('touchcancel', lecture, { passive: true });
+    if (mq.addEventListener) mq.addEventListener('change', maj); else mq.addListener(maj);
+    maj();
+  }
+  function guideAutres(list) {
+    var cur = location.pathname.replace(/\/$/, '').split('/').pop().toLowerCase(), n = 0;
+    $$('a[href*="/guide/"]', list).forEach(function (a) {
+      var it = a.closest('.w-dyn-item') || a, slug = a.getAttribute('href').replace(/\/$/, '').split('/').pop().toLowerCase();
+      var garde = slug !== cur && n < 3;
+      if (garde) n++;
+      it.style.display = garde ? 'block' : 'none';
+    });
+  }
+  function guideAriane(sec) {
+    var h = $('h1', sec);
+    if (!h || $('script[data-cv-ariane]')) return;
+    var o = location.origin, s = document.createElement('script');
+    s.type = 'application/ld+json'; s.setAttribute('data-cv-ariane', '');
+    s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: o + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Guides pratiques', item: o + '/guides-pratiques' },
+      { '@type': 'ListItem', position: 3, name: h.textContent.trim(), item: o + location.pathname }] });
+    document.head.appendChild(s);
+  }
+  function guide() {
+    var secs = anims('guide');
+    if (secs.length || $('[data-cv-anim="guides"]')) headerOffset();
+    secs.forEach(function (sec) {
+      guideAriane(sec);
+      $$('[data-cv-hs-form]').forEach(guideForm);
+      $$('[data-cv-extrait]').forEach(function (a) {
+        var u = (a.getAttribute('data-cv-extrait') || '').trim();
+        if (/^https?:\/\//.test(u)) { a.href = u; a.classList.add('cv-gd-extrait-on'); }
+      });
+    });
+    anims('guide-logos').forEach(guideLogos);
+    $$('[data-cv-guide-autres]').forEach(guideAutres);
+  }
+
+  function init() { guide(); reveal(); marquee(); faq(); rdv(); comparateur(); process(); depot(); temoignages(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
