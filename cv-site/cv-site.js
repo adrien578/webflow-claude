@@ -564,10 +564,11 @@
 
 
   /* guide (modèle /guide/{slug}, section data-cv-anim="guide") :
-     - --cv-hd = hauteur réelle du header fixe (.navbar), pour caler la page et la barre de filtres dessous ;
+     - --cv-hd = hauteur réelle du header fixe (.navbar) ; --cv-hd-pad = cette hauteur moins la marge haute du body
+       (73 px / 64 px sur le site), pour caler la page et la barre de filtres dessous ;
      - formulaire [data-cv-hs-form] : envoi au formulaire HubSpot du guide (API Forms v3) avec le cookie hubspotutk,
        l'URL (UTM comprises) et le titre de la page, comme l'iframe HubSpot ; question « fiduciaire » si
-       .cv-gd-fidu-marque est visible (champ CMS Question fiduciaire) ; succès sur place (role=status) ;
+       data-cv-fidu="Oui" (champ CMS Question fiduciaire) ; succès sur place (role=status) ;
      - lien [data-cv-extrait] : affiché seulement si l'URL de l'extrait est renseignée ;
      - logos [data-cv-anim="guide-logos"] : rangée fixe, défilement 32 s sous 767 px (pause survol / toucher) ;
      - « Autres guides » [data-cv-guide-autres] : 3 cartes, jamais le guide courant ;
@@ -576,11 +577,14 @@
   var FIDU = [['fiduciaire_actif', 'Oui, je suis déjà fiduciaire'], ['non_mais_interesse', 'Je réfléchis à le devenir à terme'],
     ['non_pas_interesse', 'Non, et je ne souhaite pas le devenir pour l\'instant'], ['non_connait_pas_fiducie', 'Je me renseigne sur la fiducie']];
   function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
-  function visible(el) { return el && el.getClientRects().length > 0; }
   function headerOffset() {
     var nav = $('.navbar'), root = document.documentElement;
     if (!nav) return;
-    function maj() { root.style.setProperty('--cv-hd', Math.round(nav.getBoundingClientRect().height) + 'px'); }
+    function maj() {
+      var h = Math.round(nav.getBoundingClientRect().height), m = parseFloat(getComputedStyle(document.body).marginTop) || 0;
+      root.style.setProperty('--cv-hd', h + 'px');
+      root.style.setProperty('--cv-hd-pad', Math.max(0, h - m) + 'px');
+    }
     maj(); addEventListener('resize', maj); addEventListener('load', maj);
     if (window.ResizeObserver) new ResizeObserver(maj).observe(nav);
   }
@@ -588,7 +592,7 @@
     var id = (root.getAttribute('data-cv-hs-form') || '').trim(), form = $('form', root), ok = $('.cv-gd-succes', root);
     if (!form || !ok || !id) return;
     var envoi = $('.cv-gd-envoyer', form), err = $('.cv-gd-erreur-envoi', form);
-    if (visible($('.cv-gd-fidu-marque', root))) {
+    if ((root.getAttribute('data-cv-fidu') || '').trim().toLowerCase() === 'oui') {
       var fs = document.createElement('fieldset');
       fs.className = 'cv-gd-champ cv-gd-radios';
       fs.setAttribute('data-requis', 'radio');
