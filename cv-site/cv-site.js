@@ -710,7 +710,7 @@
 
   /* Aperçu de l'extrait (modèle de guide) : un clic sur [data-cv-extrait] ouvre une popup qui affiche l'extrait sur la page.
      PDF (même mal nommé, ex. .png) : pdf.js (cdnjs, chargé au premier clic), lecture par morceaux (le PDF n'est pas téléchargé en entier), pages dessinées
-     à l'approche dans la zone de lecture. Image (.png, .jpg…) : affichée telle quelle. Fermeture : croix, voile, Échap ;
+     à l'approche, chaque page entière dans la hauteur de la zone de lecture. Image (.png, .jpg…) : affichée telle quelle. Fermeture : croix, voile, Échap ;
      « Recevoir le guide complet » ferme la popup et descend au formulaire. Sans JS : l'extrait s'ouvre dans un nouvel onglet. */
   var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/', mdStyle = false;
   function chargerPdfjs() {
@@ -744,16 +744,16 @@
       + '.cv-gd-modal-fermer{flex:none;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:4px;background:transparent;color:#081412;cursor:pointer}'
       + '.cv-gd-modal-fermer:hover{background:#F5F7F5}'
       + '.cv-gd-modal-fermer:focus-visible,.cv-gd-modal-pied a:focus-visible{outline:2px solid #24826B;outline-offset:2px}'
-      + '.cv-gd-modal-corps{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#F5F7F5;padding:24px;outline:none}'
+      + '.cv-gd-modal-corps{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#F5F7F5;padding:24px;outline:none;scroll-snap-type:y proximity;scroll-padding:24px}'
       + '.cv-gd-modal-liste{display:flex;flex-direction:column;align-items:center;gap:16px}'
-      + '.cv-gd-modal-page{position:relative;width:100%;max-width:820px;background:#fff;box-shadow:0 0 0 1px rgba(8,20,18,.06),0 8px 24px -12px rgba(8,20,18,.25)}'
+      + '.cv-gd-modal-page{position:relative;flex:none;width:min(100%,calc(var(--cv-md-h,70vh) * var(--r,.7071)));scroll-snap-align:start;background:#fff;box-shadow:0 0 0 1px rgba(8,20,18,.06),0 8px 24px -12px rgba(8,20,18,.25)}'
       + '.cv-gd-modal-page canvas,.cv-gd-modal-page img{display:block;width:100%;height:auto}'
       + '.cv-gd-modal-etat{margin:48px auto;max-width:44ch;text-align:center;font-size:14px;line-height:1.55;color:rgba(8,20,18,.62)}'
       + '.cv-gd-modal-etat a{color:#24826B;font-weight:500;text-decoration:underline;text-underline-offset:3px}'
       + '.cv-gd-modal-pied{display:flex;justify-content:flex-end;align-items:center;gap:16px;padding:12px 20px;border-top:1px solid #DCE2DF;background:#fff}'
       + '.cv-gd-modal-pied a{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 22px;border-radius:4px;background:#24826B;color:#fff;font-size:15px;font-weight:500;text-decoration:none;transition:background-color 200ms}'
       + '.cv-gd-modal-pied a:hover{background:#1E6E5A;color:#fff}'
-      + '@media (max-width:767px){.cv-gd-modal{padding:0}.cv-gd-modal-panneau{width:100%;height:100%;border-radius:0}.cv-gd-modal-corps{padding:12px}.cv-gd-modal-pied a{flex:1}}'
+      + '@media (max-width:767px){.cv-gd-modal{padding:0}.cv-gd-modal-panneau{width:100%;height:100%;border-radius:0}.cv-gd-modal-corps{padding:12px;scroll-padding:12px}.cv-gd-modal-pied a{flex:1}}'
       + '@media (prefers-reduced-motion:reduce){.cv-gd-modal-on .cv-gd-modal-panneau{animation:none}}';
     document.head.appendChild(s);
   }
@@ -791,6 +791,11 @@
       else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
     });
     md.corps.addEventListener('scroll', function () { compteur(); }, { passive: true });
+    md.hauteur = function () {
+      var c = md.corps, cs = getComputedStyle(c);
+      c.style.setProperty('--cv-md-h', Math.max(200, c.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) + 'px');
+    };
+    addEventListener('resize', function () { if (el.classList.contains('cv-gd-modal-on')) md.hauteur(); });
     return md;
   }
   function compteur() {
@@ -808,6 +813,7 @@
     m.overflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
     m.el.classList.add('cv-gd-modal-on');
+    m.hauteur();
     $('.cv-gd-modal-fermer', m.el).focus();
     if (m.url === url) return;
     m.url = url; txt(m.cpt, ''); m.corps.scrollTop = 0;
@@ -817,7 +823,7 @@
     function image() {
       var img = new Image();
       img.alt = 'Extrait du guide ' + nom; img.decoding = 'async';
-      img.onload = function () { if (m.url !== url) return; m.liste.innerHTML = ''; var d = document.createElement('div'); d.className = 'cv-gd-modal-page'; d.appendChild(img); m.liste.appendChild(d); };
+      img.onload = function () { if (m.url !== url) return; m.liste.innerHTML = ''; var d = document.createElement('div'); d.className = 'cv-gd-modal-page'; if (img.naturalHeight) d.style.setProperty('--r', img.naturalWidth / img.naturalHeight); d.appendChild(img); m.liste.appendChild(d); };
       img.onerror = function () { if (m.url === url) { m.url = ''; etat(secours); } };
       img.src = url;
     }
@@ -839,7 +845,7 @@
         var pages = [];
         for (var k = 1; k <= doc.numPages; k++) {
           var d = document.createElement('div');
-          d.className = 'cv-gd-modal-page'; d.style.aspectRatio = ratio;
+          d.className = 'cv-gd-modal-page'; d.style.aspectRatio = ratio; d.style.setProperty('--r', v.width / v.height);
           d.setAttribute('role', 'img'); d.setAttribute('aria-label', 'Page ' + k + ' sur ' + doc.numPages);
           d.setAttribute('data-page', k);
           m.liste.appendChild(d); pages.push(d);
@@ -853,7 +859,7 @@
             var vp = p.getViewport({ scale: Math.max(d.clientWidth, 320) * dpr / base.width });
             var c = document.createElement('canvas');
             c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
-            d.style.aspectRatio = base.width + ' / ' + base.height;
+            d.style.aspectRatio = base.width + ' / ' + base.height; d.style.setProperty('--r', base.width / base.height);
             return p.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () { d.appendChild(c); });
           }).catch(function () { d.removeAttribute('data-ok'); });
         }
