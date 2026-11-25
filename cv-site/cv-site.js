@@ -576,8 +576,9 @@
   var HS_API = 'https://api-eu1.hsforms.com/submissions/v3/integration/submit/139790115/';
   var FIDU = [['fiduciaire_actif', 'Oui, je suis déjà fiduciaire'], ['non_mais_interesse', 'Je réfléchis à le devenir à terme'],
     ['non_pas_interesse', 'Non, et je ne souhaite pas le devenir pour l\'instant'], ['non_connait_pas_fiducie', 'Je me renseigne sur la fiducie']];
-  // Structures pouvant exercer comme fiduciaire (art. 2015 du Code civil) : valeurs de la liste « typologie » HubSpot.
-  var FIDU_TYPES = ['Groupe bancaire', 'Banque indépendante', 'Avocat', 'Asset Manager', 'Assureur'];
+  // Structures pour lesquelles la question est posée : même logique que les formulaires HubSpot
+  // (« If typologie contains any of … then show Statut fiduciaire »). Valeurs de la liste « typologie ».
+  var FIDU_TYPES = ['Avocat', 'Groupe bancaire', 'Banque indépendante', 'Fonds de dette', 'Fonds Private Equity', 'Family office'];
   function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
   function headerOffset() {
     var nav = $('.navbar'), root = document.documentElement;
@@ -596,13 +597,12 @@
     var envoi = $('.cv-gd-envoyer', form), err = $('.cv-gd-erreur-envoi', form);
     if ((root.getAttribute('data-cv-fidu') || '').trim().toLowerCase() === 'oui') {
       var fs = document.createElement('fieldset');
-      fs.className = 'cv-gd-champ cv-gd-radios';
-      fs.setAttribute('data-requis', 'radio');
+      fs.className = 'cv-gd-champ cv-gd-radios';  // facultative, comme dans HubSpot
       fs.innerHTML = '<legend>Êtes-vous fiduciaire ?</legend>' + FIDU.map(function (o) {
         return '<label><input type="radio" name="statut_fiduciaire" value="' + o[0] + '"><span>' + o[1] + '</span></label>';
       }).join('') + '<span class="cv-gd-erreur" aria-live="polite"></span>';
       envoi.parentNode.insertBefore(fs, envoi);
-      // Question affichée (et obligatoire) seulement pour les structures qui peuvent être fiduciaires.
+      // Question affichée seulement pour les structures de FIDU_TYPES (facultative, comme dans HubSpot).
       var typo = $('select[name="typologie"]', form);
       var majFidu = function () {
         var on = !typo || FIDU_TYPES.indexOf(typo.value) >= 0;
