@@ -568,7 +568,7 @@
        (73 px / 64 px sur le site), pour caler la page et la barre de filtres dessous ;
      - formulaire [data-cv-hs-form] : envoi au formulaire HubSpot du guide (API Forms v3) avec le cookie hubspotutk,
        l'URL (UTM comprises) et le titre de la page, comme l'iframe HubSpot ; question « fiduciaire » si
-       data-cv-fidu="Oui" (champ CMS Question fiduciaire) ; succès sur place (role=status) ;
+       data-cv-fidu="Oui" (champ CMS Question fiduciaire), visible seulement pour les structures de FIDU_TYPES ; succès sur place (role=status) ;
      - lien [data-cv-extrait] : affiché seulement si l'URL de l'extrait est renseignée ; ouvre l'aperçu en popup ;
      - logos [data-cv-anim="guide-logos"] : rangée fixe, défilement 32 s sous 767 px (pause survol / toucher) ;
      - « Autres guides » [data-cv-guide-autres] : 3 cartes, jamais le guide courant ;
@@ -576,6 +576,8 @@
   var HS_API = 'https://api-eu1.hsforms.com/submissions/v3/integration/submit/139790115/';
   var FIDU = [['fiduciaire_actif', 'Oui, je suis déjà fiduciaire'], ['non_mais_interesse', 'Je réfléchis à le devenir à terme'],
     ['non_pas_interesse', 'Non, et je ne souhaite pas le devenir pour l\'instant'], ['non_connait_pas_fiducie', 'Je me renseigne sur la fiducie']];
+  // Structures pouvant exercer comme fiduciaire (art. 2015 du Code civil) : valeurs de la liste « typologie » HubSpot.
+  var FIDU_TYPES = ['Groupe bancaire', 'Banque indépendante', 'Avocat', 'Asset Manager', 'Assureur'];
   function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
   function headerOffset() {
     var nav = $('.navbar'), root = document.documentElement;
@@ -600,6 +602,16 @@
         return '<label><input type="radio" name="statut_fiduciaire" value="' + o[0] + '"><span>' + o[1] + '</span></label>';
       }).join('') + '<span class="cv-gd-erreur" aria-live="polite"></span>';
       envoi.parentNode.insertBefore(fs, envoi);
+      // Question affichée (et obligatoire) seulement pour les structures qui peuvent être fiduciaires.
+      var typo = $('select[name="typologie"]', form);
+      var majFidu = function () {
+        var on = !typo || FIDU_TYPES.indexOf(typo.value) >= 0;
+        fs.style.display = on ? '' : 'none';
+        if (!on) { $$('input', fs).forEach(function (i) { i.checked = false; }); erreur(fs, ''); }
+      };
+      if (typo) typo.addEventListener('change', majFidu);
+      form.addEventListener('reset', function () { setTimeout(majFidu, 0); });
+      majFidu();
     }
     function erreur(ch, msg) {
       var e = $('.cv-gd-erreur', ch), i = $('input,select', ch);
@@ -621,7 +633,10 @@
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var premier = null;
-      $$('[data-requis]', form).forEach(function (ch) { var m = valide(ch); erreur(ch, m); if (m && !premier) premier = ch; });
+      $$('[data-requis]', form).forEach(function (ch) {
+        if (ch.style.display === 'none') return;
+        var m = valide(ch); erreur(ch, m); if (m && !premier) premier = ch;
+      });
       if (premier) { var f = $('input,select', premier); if (f) f.focus(); return; }
       var champs = [];
       $$('input,select', form).forEach(function (i) {
