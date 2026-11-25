@@ -891,9 +891,17 @@
       if (champ && window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) setTimeout(function () { try { champ.focus({ preventScroll: true }); } catch (err) { champ.focus(); } }, REDUCE ? 0 : 700);
     }, true);
   }
+  /* Liens « guide courant » des listes CMS : Webflow les publie en href="#". Tout lien qui porte data-cv-slug (champ Slug)
+     et ne pointe pas déjà vers /guide/… reçoit /guide/{slug}. */
+  function liensGuides() {
+    $$('a[data-cv-slug]').forEach(function (a) {
+      var ds = (a.getAttribute('data-cv-slug') || '').trim();
+      if (ds && !/\/guide\/[^#?]/.test(a.getAttribute('href') || '')) a.setAttribute('href', '/guide/' + ds);
+    });
+  }
   function guide() {
     var secs = anims('guide');
-    if (secs.length || $('[data-cv-anim="guides"]')) { headerOffset(); ancres(); }
+    if (secs.length || $('[data-cv-anim="guides"]')) { headerOffset(); ancres(); liensGuides(); }
     secs.forEach(function (sec) {
       guideAriane(sec);
       $$('[data-cv-hs-form]').forEach(guideForm);
