@@ -852,9 +852,33 @@
     }).catch(function () { if (m.url === url) image(); });
   }
 
+  /* Liens d'ancre (#recevoir-le-guide…) sur les pages guides : le défilement de Webflow ignore la hauteur du header fixe
+     (.navbar) ; on le reprend en capture pour arrêter le haut de la cible 16 px sous le header, puis on place le curseur
+     dans le premier champ (ordinateur seulement). Un lien cliqué dans la popup d'extrait la ferme d'abord. */
+  var ancresPretes = false;
+  function ancres() {
+    if (ancresPretes) return; ancresPretes = true;
+    window.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      // Webflow réécrit href="#x" en adresse complète (page + #x) : on compare la page et on lit le hash.
+      var a = e.target.closest && e.target.closest('a[href*="#"]');
+      if (!a || a.host !== location.host || a.pathname !== location.pathname || !a.hash) return;
+      var id = decodeURIComponent(a.hash.slice(1)), cible = id && document.getElementById(id);
+      if (!cible) return;
+      e.preventDefault(); e.stopPropagation();
+      if (md && md.el.classList.contains('cv-gd-modal-on')) { md.retour = null; md.fermer(); }
+      var nav = $('.navbar'), haut = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
+      var y = cible.getBoundingClientRect().top + window.pageYOffset - haut - 16;
+      window.scrollTo({ top: Math.max(0, y), behavior: REDUCE ? 'auto' : 'smooth' });
+      if (history.replaceState) history.replaceState(null, '', '#' + id);
+      var champ = $('input:not([type=hidden]), select, textarea', cible);
+      // Curseur dans le 1er champ sur ordinateur seulement (sur mobile, le clavier s'ouvrirait sans demande).
+      if (champ && window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) setTimeout(function () { try { champ.focus({ preventScroll: true }); } catch (err) { champ.focus(); } }, REDUCE ? 0 : 700);
+    }, true);
+  }
   function guide() {
     var secs = anims('guide');
-    if (secs.length || $('[data-cv-anim="guides"]')) headerOffset();
+    if (secs.length || $('[data-cv-anim="guides"]')) { headerOffset(); ancres(); }
     secs.forEach(function (sec) {
       guideAriane(sec);
       $$('[data-cv-hs-form]').forEach(guideForm);
