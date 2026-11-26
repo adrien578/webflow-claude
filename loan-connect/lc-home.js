@@ -6,7 +6,7 @@
  * Déclencheurs (même page uniquement, interceptés au capture) :
  *   #lc-profil-projet / #lc-profil-compte -> popup profil
  *   #lc-rdv, #contact, tout lien /meetings/ hors popup -> popup rendez-vous
- *   #lc-partenaire (et le lien « Devenir partenaire » du footer sur la page partenaire) -> popup formulaire HubSpot
+ *   #lc-partenaire (et le lien « Devenir partenaire » du footer sur la page partenaire) -> popup formulaire (envoi HubSpot)
  * Calendrier du popup RDV : attribut data-lc-cal d'un élément de la page s'il existe (page partenaire), sinon celui du bloc RDV.
  * À l'arrivée avec l'un de ces hash dans l'URL, le popup correspondant s'ouvre et le hash est retiré.
  */
@@ -124,7 +124,6 @@
     + '#lc-partenaire-popup .lc-surtitre{letter-spacing:.1em;color:#005A78}'
     + '#lc-partenaire-popup .lc-titre{font-size:clamp(24px,4vw,30px);line-height:1.1;letter-spacing:-.02em}'
     + '#lc-partenaire-popup .lc-croix{width:44px;height:44px;border:1px solid #DCE2DF}'
-    + '#lc-partenaire-popup .lc-form{min-height:360px}'
     + '#lc-partenaire-popup .lc-pied{display:flex;flex-wrap:wrap;gap:4px 6px;padding-top:16px;border-top:1px solid #DCE2DF;font-size:13px;line-height:1.5;color:#4A5550}'
     + '#lc-partenaire-popup .lc-pied a{font-weight:500;color:#005A78;text-decoration:underline;text-underline-offset:3px}'
     + '#lc-partenaire-popup .lc-pied a:hover{color:#081412}'
@@ -201,27 +200,188 @@
     ouvrir(profil);
   }
 
-  /* ---------- Popup demande de partenariat (formulaire HubSpot) ----------
-   * Créé dès l'exécution du script (avant DOMContentLoaded) : le script HubSpot, chargé en defer par le bloc formulaire
-   * de la page, trouve ainsi les deux emplacements .hs-form-frame. S'il n'est pas dans la page, il est chargé ici. */
-  var HS = { src: 'https://js-eu1.hsforms.net/forms/embed/139790115.js', region: 'eu1', portail: '139790115', form: 'e70d5bd6-163e-40df-b95e-b9e783bc7e85' };
+  /* ---------- Demande de partenariat : formulaire de la page, envoyé à HubSpot (API Forms v3) ----------
+   * Rendu dans chaque [data-lc-form-partenaire] (section Formulaire et popup #lc-partenaire). Deux étapes, comme la maquette.
+   * Champs HubSpot : contact (firstname, lastname, email, phone, jobtitle, message) et entreprise 0-2 (name, profil_adherents,
+   * nombre_adherents, website). Les adresses e-mail gratuites sont refusées. */
+  var HS = { url: 'https://api-eu1.hsforms.com/submissions/v3/integration/submit/139790115/e70d5bd6-163e-40df-b95e-b9e783bc7e85' };
+  var PROFILS = [['marchands_de_biens', 'Marchands de biens'], ['promotion_immobiliere', 'Promotion immobilière'], ['investissement_immobilier', 'Investissement immobilier'], ['entreprises_pme', 'Entreprises et PME'], ['autre', 'Autre']];
+  var NOMBRES = [['moins_100', 'Moins de 100'], ['100_500', '100 à 500'], ['500_2000', '500 à 2 000'], ['plus_2000', 'Plus de 2 000']];
+  var MAILS_GRATUITS = ['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.fr', 'outlook.com', 'outlook.fr', 'live.com', 'live.fr', 'msn.com', 'yahoo.com', 'yahoo.fr', 'icloud.com', 'me.com', 'aol.com', 'orange.fr', 'wanadoo.fr', 'free.fr', 'sfr.fr', 'neuf.fr', 'bbox.fr', 'laposte.net', 'gmx.fr', 'gmx.com', 'protonmail.com', 'proton.me'];
+  var CONSENTEMENT = 'J’accepte que Covalt utilise ces informations pour traiter ma demande de partenariat.';
+  var formCss = ''
+    + '.lc-fp{display:flex;flex-direction:column;gap:24px;font-family:var(--_covalt-tokens---cv-police-texte,inherit);color:#081412;text-align:left}'
+    + '.lc-fp *{box-sizing:border-box}'
+    + '.lc-fp-barres{display:grid;grid-template-columns:1fr 1fr;gap:6px}.lc-fp-barres span{height:3px;background:#DCE2DF;transition:background-color .3s}.lc-fp-barres span.is-on{background:#007AA3}'
+    + '.lc-fp-etape{display:flex;flex-direction:column;gap:16px;animation:lcFpIn .4s cubic-bezier(.2,0,0,1) both}.lc-fp-etape[hidden]{display:none}'
+    + '@keyframes lcFpIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
+    + '@media (prefers-reduced-motion:reduce){.lc-fp-etape,.lc-fp-ok{animation:none}}'
+    + '.lc-fp-entete{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid #DCE2DF}'
+    + '.lc-fp-entete b{font-family:' + MONO + ';font-weight:400;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#7A8682}'
+    + '.lc-fp-entete span{font-size:12px;color:#7A8682}'
+    + '.lc-fp-ligne{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:16px}'
+    + '.lc-fp label.lc-fp-champ{display:flex;flex-direction:column;gap:6px;min-width:0;margin:0;font-weight:400}'
+    + '.lc-fp-lib{font-size:13px;font-weight:500;line-height:1.4}.lc-fp-lib i{font-style:normal;color:#007AA3}'
+    + '.lc-fp input:not([type=checkbox]),.lc-fp select,.lc-fp textarea{width:100%;min-width:0;height:44px;margin:0;padding:0 12px;border:1px solid #DCE2DF;border-radius:4px;background:#fff;font-family:inherit;font-size:15px;line-height:1.4;color:#081412;box-shadow:none;outline:none;transition:border-color .15s,box-shadow .15s}'
+    + '.lc-fp textarea{height:auto;min-height:92px;padding:10px 12px;line-height:1.5;resize:vertical}'
+    + '.lc-fp select{-webkit-appearance:none;appearance:none;padding-right:40px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23081412%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}'
+    + '.lc-fp select:invalid{color:#7A8682}.lc-fp select option{color:#081412}'
+    + '.lc-fp input::placeholder,.lc-fp textarea::placeholder{color:#7A8682;opacity:1}'
+    + '.lc-fp input:not([type=checkbox]):focus,.lc-fp select:focus,.lc-fp textarea:focus{border-color:#007AA3;box-shadow:0 0 0 3px rgba(0,122,163,.15)}'
+    + '.lc-fp .is-err input,.lc-fp .is-err select{border-color:#C2412D}'
+    + '.lc-fp-msg{font-size:12px;line-height:1.4;color:#C2412D}'
+    + '.lc-fp label.lc-fp-case{display:flex;gap:10px;align-items:flex-start;margin:0;font-size:13px;font-weight:400;line-height:1.5;color:#4A5550;cursor:pointer}'
+    + '.lc-fp-case input{width:18px;height:18px;margin:1px 0 0;flex:none;accent-color:#007AA3}'
+    + '.lc-fp-btn{display:flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 18px;border:0;border-radius:4px;background:#007AA3;color:#fff;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:background-color .15s}'
+    + '.lc-fp-btn:hover{background:#005A78}.lc-fp-btn[disabled]{opacity:.6;cursor:wait}'
+    + '.lc-fp-btn--plein{width:100%;margin-top:8px}.lc-fp-btn--flex{flex:1;min-width:0}'
+    + '.lc-fp-btn--retour{background:#fff;color:#081412;border:1px solid rgba(8,20,18,.2)}.lc-fp-btn--retour:hover{background:#fff;border-color:#081412}'
+    + '.lc-fp-btn:focus-visible,.lc-fp-case input:focus-visible{outline:2px solid #007AA3;outline-offset:2px}'
+    + '.lc-fp-actions{display:flex;gap:12px}'
+    + '.lc-fp-erreur{padding:10px 12px;border:1px solid #F1C9C1;background:#FDF3F1;border-radius:4px;font-size:13px;line-height:1.5;color:#8A2E1F}'
+    + '.lc-fp-ok{min-height:360px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:16px;animation:lcFpIn .45s cubic-bezier(.2,0,0,1) both}'
+    + '.lc-fp-ok-rond{width:44px;height:44px;border-radius:50%;background:#EEF6F9;border:1px solid #B8D8E6;display:grid;place-items:center;color:#007AA3}'
+    + '.lc-fp-ok-titre{font-family:' + TITRES + ';font-size:26px;line-height:1.15;letter-spacing:-.01em}'
+    + '.lc-fp-ok-txt{font-size:15px;line-height:1.6;color:#4A5550;max-width:40ch}';
+
+  var nFp = 0;
+  function formPartenaire(box) {
+    if (box.getAttribute('data-lc-pret')) return;
+    box.setAttribute('data-lc-pret', '1');
+    var n = ++nFp;
+    function champ(nom, lib, type, requis, attrs) {
+      return '<label class="lc-fp-champ"><span class="lc-fp-lib">' + lib + (requis ? ' <i aria-hidden="true">*</i>' : '') + '</span>'
+        + '<input name="' + nom + '" type="' + type + '"' + (requis ? ' required' : '') + (attrs || '') + '></label>';
+    }
+    function liste(nom, lib, opts) {
+      return '<label class="lc-fp-champ"><span class="lc-fp-lib">' + lib + ' <i aria-hidden="true">*</i></span><select name="' + nom + '" required>'
+        + '<option value="">Sélectionnez</option>' + opts.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('') + '</select></label>';
+    }
+    box.innerHTML = '<form class="lc-fp" novalidate>'
+      + '<div class="lc-fp-barres" aria-hidden="true"><span class="is-on"></span><span></span></div>'
+      + '<div class="lc-fp-etape" data-e="1"><div class="lc-fp-entete"><b>Vous</b><span>Étape 1 sur 2</span></div>'
+      + '<div class="lc-fp-ligne">' + champ('firstname', 'Prénom', 'text', 1, ' autocomplete="given-name"') + champ('lastname', 'Nom', 'text', 1, ' autocomplete="family-name"') + '</div>'
+      + '<div class="lc-fp-ligne">' + champ('email', 'Email professionnel', 'email', 1, ' autocomplete="email"') + champ('phone', 'Téléphone', 'tel', 1, ' autocomplete="tel" pattern="[\\d\\s+.\\(\\)\\-]{6,}"') + '</div>'
+      + champ('jobtitle', 'Fonction', 'text', 1, ' autocomplete="organization-title" placeholder="Président, délégué général, responsable partenariats…"')
+      + '<button type="submit" class="lc-fp-btn lc-fp-btn--plein">Continuer ' + fleche(16) + '</button></div>'
+      + '<div class="lc-fp-etape" data-e="2" hidden><div class="lc-fp-entete"><b>Votre structure</b><span>Étape 2 sur 2</span></div>'
+      + champ('company', 'Nom de la structure', 'text', 1, ' autocomplete="organization"')
+      + liste('profil_adherents', 'Profil de vos adhérents', PROFILS)
+      + '<div class="lc-fp-ligne">' + liste('nombre_adherents', 'Nombre d’adhérents', NOMBRES) + champ('website', 'Site web', 'text', 0, ' autocomplete="url" placeholder="www.exemple.fr"') + '</div>'
+      + '<label class="lc-fp-champ"><span class="lc-fp-lib">Message</span><textarea name="message" rows="3"></textarea></label>'
+      + '<label class="lc-fp-case"><input type="checkbox" name="consentement" required><span>' + CONSENTEMENT + ' <i style="font-style:normal;color:#007AA3" aria-hidden="true">*</i></span></label>'
+      + '<div class="lc-fp-erreur" role="alert" hidden></div>'
+      + '<div class="lc-fp-actions"><button type="button" class="lc-fp-btn lc-fp-btn--retour" data-retour>' + svg(16, '<path d="M19 12H5M11 18l-6-6 6-6"/>') + 'Retour</button>'
+      + '<button type="submit" class="lc-fp-btn lc-fp-btn--flex">Envoyer la demande ' + fleche(16) + '</button></div></div>'
+      + '</form>';
+    var form = box.querySelector('form'), E = $$('.lc-fp-etape', form), barres = $$('.lc-fp-barres span', form), err = form.querySelector('.lc-fp-erreur');
+    var etape = 1;
+    $$('input, select, textarea', form).forEach(function (el) { el.id = 'lc-fp' + n + '-' + el.name; });
+    function msg(el, t) {
+      var l = el.closest('label'); if (!l) return;
+      var m = l.querySelector('.lc-fp-msg');
+      l.classList.toggle('is-err', !!t);
+      if (!t) { if (m) m.remove(); el.removeAttribute('aria-invalid'); return; }
+      if (!m) { m = document.createElement('span'); m.className = 'lc-fp-msg'; m.id = el.id + '-err'; l.appendChild(m); }
+      m.textContent = t; el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', m.id);
+    }
+    function texteErreur(el) {
+      var v = el.validity;
+      if (el.type === 'checkbox') return 'Merci de cocher cette case pour continuer.';
+      if (v.valueMissing) return el.tagName === 'SELECT' ? 'Sélectionnez une réponse.' : 'Ce champ est obligatoire.';
+      if (el.name === 'email' && v.customError) return el.validationMessage;
+      if (el.name === 'email') return 'Saisissez une adresse e-mail valide.';
+      if (el.name === 'phone') return 'Saisissez un numéro de téléphone valide.';
+      return 'Valeur incorrecte.';
+    }
+    function verifie(k) {
+      var mail = form.elements.email;
+      if (k === 1) {
+        var d = (mail.value.split('@')[1] || '').trim().toLowerCase();
+        mail.setCustomValidity(MAILS_GRATUITS.indexOf(d) > -1 ? 'Veuillez saisir votre adresse e-mail professionnelle.' : '');
+      }
+      var premier = null;
+      $$('input, select, textarea', E[k - 1]).forEach(function (el) {
+        var ok = el.checkValidity();
+        msg(el, ok ? '' : texteErreur(el));
+        if (!ok && !premier) premier = el;
+      });
+      if (premier) premier.focus();
+      return !premier;
+    }
+    $$('input, select, textarea', form).forEach(function (el) {
+      el.addEventListener(el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'blur', function () {
+        if (el.closest('label').classList.contains('is-err')) { if (el.name === 'email') el.setCustomValidity(''); if (el.checkValidity()) msg(el, ''); }
+      });
+    });
+    function aller(k) {
+      etape = k;
+      E.forEach(function (e, i) { e.hidden = i !== k - 1; });
+      barres[1].classList.toggle('is-on', k === 2);
+      var pan = box.closest('.lc-panneau'); if (pan) pan.scrollTop = 0;
+      var f = $$('input, select', E[k - 1])[0];
+      setTimeout(function () { if (f) f.focus({ preventScroll: !pan }); }, 60);
+    }
+    form.querySelector('[data-retour]').addEventListener('click', function () { aller(1); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      err.hidden = true;
+      if (!verifie(etape)) return;
+      if (etape === 1) { aller(2); return; }
+      var el = form.elements, btn = E[1].querySelector('[type=submit]');
+      function v(nom) { return (el[nom].value || '').trim(); }
+      var fields = [['0-1', 'firstname'], ['0-1', 'lastname'], ['0-1', 'email'], ['0-1', 'phone'], ['0-1', 'jobtitle'], ['0-1', 'message'],
+        ['0-2', 'name', 'company'], ['0-2', 'profil_adherents'], ['0-2', 'nombre_adherents'], ['0-2', 'website']]
+        .map(function (f) { return { objectTypeId: f[0], name: f[1], value: v(f[2] || f[1]) }; })
+        .filter(function (f) { return f.value; });
+      var utk = document.cookie.match(/(?:^|;\s*)hubspotutk=([^;]+)/);
+      var ctx = { pageUri: location.href, pageName: document.title };
+      if (utk) ctx.hutk = decodeURIComponent(utk[1]);
+      btn.disabled = true;
+      fetch(HS.url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: fields, context: ctx, legalConsentOptions: { consent: { consentToProcess: true, text: CONSENTEMENT } } }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          btn.disabled = false;
+          if (!res.ok) {
+            var errs = (res.j && res.j.errors) || [];
+            var mailKo = errs.some(function (x) { return /EMAIL/.test(x.errorType || '') || /email/i.test(x.message || ''); });
+            if (mailKo) { aller(1); el.email.setCustomValidity('Cette adresse e-mail n’est pas acceptée. Utilisez votre adresse professionnelle.'); msg(el.email, el.email.validationMessage); el.email.focus(); return; }
+            err.textContent = 'L’envoi n’a pas abouti. Réessayez dans un instant ou prenez rendez-vous avec un expert.';
+            err.hidden = false; return;
+          }
+          box.innerHTML = '<div class="lc-fp lc-fp-ok" role="status" tabindex="-1"><span class="lc-fp-ok-rond">' + svg(22, '<path d="M20 6 9 17l-5-5"/>').replace('stroke-width="1.5"', 'stroke-width="2"') + '</span>'
+            + '<span class="lc-fp-ok-titre">Demande envoyée.</span><span class="lc-fp-ok-txt">Notre équipe étudie votre demande et revient vers vous avec votre code partenaire.</span></div>';
+          var ok = box.firstChild; ok.focus({ preventScroll: true });
+          if (window.dataLayer) window.dataLayer.push({ event: 'lc_demande_partenariat' });
+        })
+        .catch(function () {
+          btn.disabled = false;
+          err.textContent = 'L’envoi n’a pas abouti (connexion). Réessayez dans un instant ou prenez rendez-vous avec un expert.';
+          err.hidden = false;
+        });
+    });
+  }
+
   var part = null;
   function popupPartenaire() {
-    if (part || !document.body || !document.head || !document.querySelector('[data-lc-cal], .hs-form-frame[data-form-id="' + HS.form + '"]')) return;
-    styles();
+    if (part || !document.querySelector('[data-lc-form-partenaire]')) return;
     part = voile('lc-partenaire-popup', 'Demande de partenariat');
     var p = document.createElement('div'); p.className = 'lc-panneau';
     p.innerHTML = '<div class="lc-tete"><div class="lc-tete-txt"><span class="lc-surtitre">Demande de partenariat</span>'
       + '<h2 class="lc-titre">Parlez-nous de votre structure</h2></div></div>'
-      + '<div class="lc-form"><div class="hs-form-frame" data-region="' + HS.region + '" data-form-id="' + HS.form + '" data-portal-id="' + HS.portail + '"></div></div>'
+      + '<div class="lc-form" data-lc-form-partenaire></div>'
       + '<div class="lc-pied"><span>Vous préférez en parler ?</span><a href="#lc-rdv">Prendre rendez-vous avec un expert</a></div>';
     p.querySelector('.lc-tete').appendChild(croix());
     part.appendChild(p);
-    if (!document.querySelector('script[src*="hsforms.net/forms/embed/"]')) {
-      var sc = document.createElement('script'); sc.src = HS.src; sc.defer = true; document.body.appendChild(sc);
-    }
   }
-  popupPartenaire();
+  function formulairesPartenaire() {
+    popupPartenaire();
+    var boites = $$('[data-lc-form-partenaire]');
+    if (!boites.length) return;
+    var st = document.createElement('style'); st.textContent = formCss; document.head.appendChild(st);
+    boites.forEach(formPartenaire);
+  }
 
   /* ---------- Popup rendez-vous ---------- */
   var rdv, rdvFrame;
@@ -1019,7 +1179,7 @@
   function init() {
     styles();
     var cal = document.querySelector('[data-lc-cal]'); if (cal) CAL = cal.getAttribute('data-lc-cal');
-    popupPartenaire();
+    formulairesPartenaire();
     comparateurs();
     partenaire();
     /* Navigation : lien de la page courante actif (liens URL du header partagé, que Webflow ne marque pas). */
