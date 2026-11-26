@@ -310,7 +310,7 @@
       return !premier;
     }
     $$('input, select, textarea', form).forEach(function (el) {
-      el.addEventListener(el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'blur', function () {
+      el.addEventListener(el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'input', function () {
         if (el.closest('label').classList.contains('is-err')) { if (el.name === 'email') el.setCustomValidity(''); if (el.checkValidity()) msg(el, ''); }
       });
     });
