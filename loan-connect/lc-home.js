@@ -333,7 +333,9 @@
       var fields = [['0-1', 'firstname'], ['0-1', 'lastname'], ['0-1', 'email'], ['0-1', 'phone'], ['0-1', 'jobtitle'], ['0-1', 'message'],
         ['0-2', 'name', 'company'], ['0-2', 'profil_adherents'], ['0-2', 'nombre_adherents'], ['0-2', 'website']]
         .map(function (f) { return { objectTypeId: f[0], name: f[1], value: v(f[2] || f[1]) }; })
-        .filter(function (f) { return f.value; });
+        .filter(function (f) { return f.value; })
+        /* Champ masqué du formulaire HubSpot : typologie de la structure, toujours la même pour cette page. */
+        .concat([{ objectTypeId: '0-2', name: 'typologie_ia', value: "Organisation professionnelle ou réseau d'entrepreneurs" }]);
       var utk = document.cookie.match(/(?:^|;\s*)hubspotutk=([^;]+)/);
       var ctx = { pageUri: location.href, pageName: document.title };
       if (utk) ctx.hutk = decodeURIComponent(utk[1]);
