@@ -1022,6 +1022,8 @@
     popupPartenaire();
     comparateurs();
     partenaire();
+    /* Navigation : lien de la page courante actif (liens URL du header partagé, que Webflow ne marque pas). */
+    $$('.lc-site-nav-lien, .lc-site-menu-lien').forEach(function (l) { if (samePage(l) && !l.hash) { l.classList.add('w--current'); l.setAttribute('aria-current', 'page'); } });
     dossiers();
     preteurs();
     preteur();
