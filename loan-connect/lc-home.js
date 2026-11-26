@@ -1,10 +1,13 @@
-/* Loan Connect, pages site (Home, Emprunteur, Conseil, Prêteur) : UTM, calendrier intégré, popups profil et rendez-vous,
- * animations des illustrations Conseil (dossiers clients, prêteurs correspondants) et de la page Prêteur (hero, entonnoir, process épinglé, étape e-mail du RDV).
+/* Loan Connect, pages site (Home, Emprunteur, Conseil, Prêteur, Devenir partenaire) : UTM, calendrier intégré, popups profil,
+ * rendez-vous et demande de partenariat, animations des illustrations Conseil (dossiers clients, prêteurs correspondants),
+ * de la page Prêteur (hero, entonnoir, process épinglé, étape e-mail du RDV) et de la page Devenir partenaire (carte du hero, process).
  * Remplace l'ancien code de pied de page et le script lcprofillinks. Vanilla JS, sans dépendance.
  *
  * Déclencheurs (même page uniquement, interceptés au capture) :
  *   #lc-profil-projet / #lc-profil-compte -> popup profil
  *   #lc-rdv, #contact, tout lien /meetings/ hors popup -> popup rendez-vous
+ *   #lc-partenaire (et le lien « Devenir partenaire » du footer sur la page partenaire) -> popup formulaire HubSpot
+ * Calendrier du popup RDV : attribut data-lc-cal d'un élément de la page s'il existe (page partenaire), sinon celui du bloc RDV.
  * À l'arrivée avec l'un de ces hash dans l'URL, le popup correspondant s'ouvre et le hash est retiré.
  */
 (function () {
@@ -64,6 +67,7 @@
       if (h === '#lc-profil-compte') return 'compte';
     }
     if (samePage(a) && (h === '#lc-rdv' || h === '#contact')) return 'rdv';
+    if (part && samePage(a) && (h === '#lc-partenaire' || (!h && a.closest('.lc-site-footer')))) return 'partenaire';
     if (a.href.indexOf('/meetings/') > -1 && !a.closest('.lc-voile')) return 'meetings';
     return '';
   }
@@ -111,7 +115,20 @@
     + '#lc-rdv-popup .lc-titre{font-size:clamp(20px,2.4vw,24px);line-height:1.2;letter-spacing:-.01em}'
     + '#lc-rdv-popup .lc-croix{width:40px;height:40px;border:1px solid #DCE2DF}'
     + '#lc-rdv-popup .lc-corps{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}'
-    + '#lc-rdv-popup iframe{display:block;width:100%;height:680px;border:0}';
+    + '#lc-rdv-popup iframe{display:block;width:100%;height:680px;border:0}'
+    /* popup demande de partenariat */
+    + '#lc-partenaire-popup{z-index:205;background:rgba(8,20,18,.55);padding:clamp(0px,3vw,24px)}'
+    + '#lc-partenaire-popup .lc-panneau{max-width:560px;max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:clamp(24px,5vw,40px);display:flex;flex-direction:column;gap:24px}'
+    + '#lc-partenaire-popup .lc-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}'
+    + '#lc-partenaire-popup .lc-tete-txt{display:flex;flex-direction:column;gap:10px;min-width:0}'
+    + '#lc-partenaire-popup .lc-surtitre{letter-spacing:.1em;color:#005A78}'
+    + '#lc-partenaire-popup .lc-titre{font-size:clamp(24px,4vw,30px);line-height:1.1;letter-spacing:-.02em}'
+    + '#lc-partenaire-popup .lc-croix{width:44px;height:44px;border:1px solid #DCE2DF}'
+    + '#lc-partenaire-popup .lc-form{min-height:360px}'
+    + '#lc-partenaire-popup .lc-pied{display:flex;flex-wrap:wrap;gap:4px 6px;padding-top:16px;border-top:1px solid #DCE2DF;font-size:13px;line-height:1.5;color:#4A5550}'
+    + '#lc-partenaire-popup .lc-pied a{font-weight:500;color:#005A78;text-decoration:underline;text-underline-offset:3px}'
+    + '#lc-partenaire-popup .lc-pied a:hover{color:#081412}'
+    + '@media (max-width:767px){#lc-partenaire-popup .lc-panneau{border-radius:0;height:100%}}';
 
   /* Icônes Lucide : building-2, briefcase, arrow-right, x */
   function svg(size, paths) {
@@ -183,6 +200,28 @@
       + carte(withParams(d.c, false), IC_CONSEIL, 'Je suis un conseil en financement', 'J’accompagne mes clients dans leur recherche de financement');
     ouvrir(profil);
   }
+
+  /* ---------- Popup demande de partenariat (formulaire HubSpot) ----------
+   * Créé dès l'exécution du script (avant DOMContentLoaded) : le script HubSpot, chargé en defer par le bloc formulaire
+   * de la page, trouve ainsi les deux emplacements .hs-form-frame. S'il n'est pas dans la page, il est chargé ici. */
+  var HS = { src: 'https://js-eu1.hsforms.net/forms/embed/139790115.js', region: 'eu1', portail: '139790115', form: 'e70d5bd6-163e-40df-b95e-b9e783bc7e85' };
+  var part = null;
+  function popupPartenaire() {
+    if (part || !document.body || !document.head || !document.querySelector('[data-lc-cal], .hs-form-frame[data-form-id="' + HS.form + '"]')) return;
+    styles();
+    part = voile('lc-partenaire-popup', 'Demande de partenariat');
+    var p = document.createElement('div'); p.className = 'lc-panneau';
+    p.innerHTML = '<div class="lc-tete"><div class="lc-tete-txt"><span class="lc-surtitre">Demande de partenariat</span>'
+      + '<h2 class="lc-titre">Parlez-nous de votre structure</h2></div></div>'
+      + '<div class="lc-form"><div class="hs-form-frame" data-region="' + HS.region + '" data-form-id="' + HS.form + '" data-portal-id="' + HS.portail + '"></div></div>'
+      + '<div class="lc-pied"><span>Vous préférez en parler ?</span><a href="#lc-rdv">Prendre rendez-vous avec un expert</a></div>';
+    p.querySelector('.lc-tete').appendChild(croix());
+    part.appendChild(p);
+    if (!document.querySelector('script[src*="hsforms.net/forms/embed/"]')) {
+      var sc = document.createElement('script'); sc.src = HS.src; sc.defer = true; document.body.appendChild(sc);
+    }
+  }
+  popupPartenaire();
 
   /* ---------- Popup rendez-vous ---------- */
   var rdv, rdvFrame;
@@ -765,6 +804,20 @@
     });
   }
 
+  /* Comparateur des autres pages : même 7e champ (nom de la garantie 1) qu'en page Prêteur. */
+  function comparateurs() {
+    $$('[data-cv-anim="comparateur"]').forEach(function (root) {
+      if (root.closest('[data-lc-anim="pr-sp"]')) return;
+      var S = (root.getAttribute('data-cv-scenarios') || '').split(';').map(function (s) { return s.split('|').map(function (x) { return x.trim(); }); });
+      if (!S.some(function (x) { return x[6]; })) return;
+      var m = $$('.cv-comp-champs .cv-comp-champ-valeur', root)[0], g = $$('.cv-comp-ligne .cv-comp-ligne-gauche .cv-comp-champ-valeur', root)[0];
+      if (!m || !g) return;
+      function maj() { S.forEach(function (x) { if (x[0] === m.textContent.trim() && x[6] && g.textContent !== x[6]) g.textContent = x[6]; }); }
+      new MutationObserver(maj).observe(m, { childList: true, characterData: true, subtree: true });
+      maj();
+    });
+  }
+
   /* Bloc RDV : étape e-mail (mini calendrier décoratif), puis calendrier HubSpot avec l'e-mail pré-rempli. */
   function prRdv(root, tpl) {
     var J = [['13'], ['14'], ['15', 'd'], ['16'], ['17', 'd'], ['20', 'd'], ['21', 's'], ['22'], ['23', 'd'], ['24']];
@@ -809,16 +862,173 @@
     $$('.lc-pr-sp-lien').forEach(function (a) { if (!a.querySelector('svg')) a.insertAdjacentHTML('beforeend', ic(16, '<path d="M5 12h14M13 6l6 6-6 6"/>')); });
   }
 
+  /* ---------- Page Devenir partenaire (maquette « LP Devenir Partenaire ») ----------
+   * [data-lc-anim="part-hero"]     carte « Programme partenaires » du hero : code FED-2026 tapé puis « Copié », boucle de 6 s
+   * [data-lc-anim="part-process"]  3 écrans du process (demande, code partenaire, projet d'un adhérent), synchronisés
+   *                                sur l'étape ouverte du module process de cv-site.js (aria-expanded des .cv-process-etape)
+   */
+  var CODE = 'FED-2026';
+  var partCss = ''
+    + '[data-lc-anim^="part-"]{font-family:var(--_covalt-tokens---cv-police-texte,inherit);color:#081412;text-align:left}'
+    + '.lc-pa-carte{background:#fff;border:1px solid #DCE2DF;border-radius:4px;box-shadow:0 1px 2px rgba(23,33,28,.06),0 10px 28px -6px rgba(23,33,28,.16);display:flex;flex-direction:column}'
+    + '.lc-pa-mono{font-family:' + MONO + ';font-size:10px;letter-spacing:.1em;color:#7A8682}'
+    + '.lc-pa-tete{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #DCE2DF}'
+    + '.lc-pa-actif{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:4px;font-size:11px;background:#EEF6F9;border:1px solid #B8D8E6;color:#005A78}'
+    + '.lc-pa-point{width:6px;height:6px;border-radius:50%;background:#007AA3;animation:lcLive 1.6s infinite}'
+    + '@keyframes lcLive{0%{box-shadow:0 0 0 0 rgba(0,122,163,.45)}100%{box-shadow:0 0 0 8px rgba(0,122,163,0)}}'
+    + '.lc-pa-code{display:flex;justify-content:space-between;align-items:center;gap:12px;height:56px;padding:0 16px;border:1px solid #B8D8E6;background:#F4F9FB;border-radius:4px}'
+    + '.lc-pa-code-v{font-family:' + MONO + ';font-size:22px;letter-spacing:.08em;color:#005A78;white-space:nowrap}'
+    + '.lc-pa-caret{display:inline-block;width:2px;height:20px;margin-left:2px;vertical-align:-3px;background:#007AA3}'
+    + '.lc-pa-copie{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#7A8682;transition:color .3s;white-space:nowrap}'
+    + '.lc-pa-ligne{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0}'
+    + '.lc-pa-ligne+.lc-pa-ligne{border-top:1px solid #DCE2DF}'
+    + '.lc-pa-av{display:flex;align-items:center;gap:10px;font-size:14px}'
+    + '.lc-pa-taux{display:flex;align-items:baseline;gap:8px;font-family:' + MONO + ';font-size:13px;color:#005A78;white-space:nowrap}'
+    + '.lc-pa-barre{color:#7A8682;text-decoration:line-through}'
+    + '.lc-pa-pied{display:flex;align-items:center;gap:12px;margin-top:6px;padding:14px 20px;border-top:1px solid #DCE2DF;background:#F5F7F5;font-size:13px;color:#4A5550}'
+    /* process */
+    + '.lc-pp2{min-height:400px;animation:lcIn2 .5s cubic-bezier(.2,0,0,1) both}'
+    + '.lc-pp2[hidden]{display:none}'
+    + '@keyframes lcIn2{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
+    + '.lc-pp2-tete{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #DCE2DF}'
+    + '.lc-pp2-titre{font-family:' + TITRES + ';font-size:18px}'
+    + '.lc-pp2-corps{display:flex;flex-direction:column;gap:16px;padding:20px;flex:1}'
+    + '.lc-pp2-champ{display:flex;flex-direction:column;gap:6px;min-width:0}'
+    + '.lc-pp2-lib{font-size:11px;color:#7A8682}'
+    + '.lc-pp2-val{height:38px;display:flex;align-items:center;padding:0 10px;border:1px solid #DCE2DF;border-radius:4px;font-size:14px;white-space:nowrap;overflow:hidden;transition:border-color .3s,box-shadow .2s}'
+    + '.lc-pp2-btn{margin-top:auto;height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;background:#F5F7F5;color:#7A8682;transition:background-color .3s,color .3s}'
+    + '.lc-pp2-ok{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #DCE2DF}'
+    + '.lc-pp2-rond{width:36px;height:36px;flex:none;border-radius:50%;background:#007AA3;color:#fff;display:grid;place-items:center;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}'
+    + '.lc-pp2-rise{transition:opacity .35s,transform .45s cubic-bezier(.2,0,0,1)}'
+    + '.lc-pp2-canal{display:flex;align-items:center;gap:10px;font-size:13px;color:#4A5550}'
+    + '.lc-pp2-deux{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'
+    + '.lc-pp2-reconnu{margin-top:auto;border:1px solid #B8D8E6;background:#F4F9FB;border-radius:4px;overflow:hidden}'
+    + '.lc-pp2-reconnu>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;font-size:12px}'
+    + '.lc-pp2-reconnu>div+div{border-top:1px solid #DCE8EE}'
+    /* mobile : écran compact dans l'étape ouverte (lcprocessmobile) */
+    + '@media (max-width:767px){.lc-illus-mob .lc-pp2{min-height:0;animation:none}.lc-illus-mob .lc-pp2-tete,.lc-illus-mob .lc-pp2-canaux,.lc-illus-mob .lc-pp2-deux,.lc-illus-mob .lc-pp2-codelib{display:none}'
+    + '.lc-illus-mob .lc-pp2-corps{padding:12px 14px;gap:10px}.lc-illus-mob .lc-pp2-ok{padding:12px 14px;border-bottom:0}.lc-illus-mob .lc-pp2-rond{width:28px;height:28px}'
+    + '.lc-illus-mob .lc-pa-code{height:44px}.lc-illus-mob .lc-pa-code-v{font-size:16px}.lc-illus-mob .lc-pp2-codezone{padding:0 14px 14px!important}.lc-illus-mob .lc-pp2-btn{height:36px;font-size:13px}}';
+  var CHK = '<path d="M20 6 9 17l-5-5"/>';
+  var COPIE = ic(14, '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>');
+  function tape(str, a, b, t) { return t < a ? '' : t >= b ? str : str.slice(0, Math.ceil(str.length * (t - a) / (b - a))); }
+
+  function partHero(box) {
+    box.innerHTML = '<div class="lc-pa-carte">'
+      + '<div class="lc-pa-tete"><span class="lc-pa-mono">PROGRAMME PARTENAIRES</span><span class="lc-pa-actif"><span class="lc-pa-point"></span>Actif</span></div>'
+      + '<div style="display:flex;flex-direction:column;gap:10px;padding:20px 20px 18px"><span style="font-size:12px;color:#7A8682">Votre code partenaire</span>'
+      + '<div class="lc-pa-code"><span class="lc-pa-code-v"><span data-v></span><span class="lc-pa-caret" data-c></span></span><span class="lc-pa-copie" data-k>' + COPIE + '<span>Copier</span></span></div></div>'
+      + '<div style="display:flex;flex-direction:column;padding:0 20px"><span class="lc-pa-mono" style="padding-bottom:4px">AVANTAGES DE VOS ADHÉRENTS</span>'
+      + '<div class="lc-pa-ligne"><span class="lc-pa-av">' + ic(16, CHK, '#007AA3', ' style="flex:none;stroke-width:2"') + 'Première opération</span><span class="lc-pa-taux"><span class="lc-pa-barre">1 %</span><span>0,8 %</span></span></div>'
+      + '<div class="lc-pa-ligne"><span class="lc-pa-av">' + ic(16, CHK, '#007AA3', ' style="flex:none;stroke-width:2"') + 'Premier contrat de sécurisation</span><span class="lc-pa-taux">-10 %</span></div></div>'
+      + '<div class="lc-pa-pied">' + ic(16, '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>', '#007AA3', ' style="flex:none"')
+      + '<span>Pour votre structure · <span style="color:#081412;font-weight:500">un webinar dédié</span></span></div></div>';
+    var v = box.querySelector('[data-v]'), c = box.querySelector('[data-c]'), k = box.querySelector('[data-k]'), kt = k.lastChild;
+    function rendu(h) {
+      var copie = h >= 2200 && h < 4200, frappe = h >= 300 && h < 1300;
+      txtSet(v, tape(CODE, 300, 1300, h));
+      c.style.opacity = frappe || (h < 2200 && h % 1000 < 600) ? '1' : '0';
+      txtSet(kt, copie ? 'Copié' : 'Copier');
+      k.style.color = copie ? '#007AA3' : '';
+    }
+    if (REDUCE) { rendu(1300); c.style.opacity = '0'; return; }
+    var h = 0, vu = false;
+    visible(box, function (x) { vu = x; });
+    rendu(0);
+    setInterval(function () { if (!vu) return; h = (h + 100) % 6000; rendu(h); }, 100);
+  }
+  function txtSet(el, t) { if (el && el.textContent !== t) el.textContent = t; }
+
+  function partProcess(box) {
+    var section = box.closest('section') || document;
+    var etapes = $$('.cv-process-etape', section);
+    function champ(k, cls) { return '<div class="lc-pp2-champ ' + (cls || '') + '"><span class="lc-pp2-lib">' + k + '</span><span class="lc-pp2-val"></span></div>'; }
+    box.innerHTML = ''
+      + '<div class="lc-pa-carte lc-pp2" data-e="0"><div class="lc-pp2-tete"><span class="lc-pp2-titre">Demande de partenariat</span><span class="lc-pa-mono">ÉTAPE 1/3</span></div>'
+      + '<div class="lc-pp2-corps">' + champ('Structure') + champ('Profil de vos adhérents') + champ("Nombre d'adhérents") + '<div class="lc-pp2-btn"></div></div></div>'
+      + '<div class="lc-pa-carte lc-pp2" data-e="1" hidden><div class="lc-pp2-tete"><span class="lc-pp2-titre">Votre code partenaire</span><span class="lc-pa-mono">ÉTAPE 2/3</span></div>'
+      + '<div class="lc-pp2-ok"><span class="lc-pp2-rond">' + ic(18, CHK, 'currentColor', ' style="stroke-width:2"') + '</span><span style="display:flex;flex-direction:column;gap:3px;min-width:0"><span style="font-family:' + TITRES_A + ';font-size:19px;letter-spacing:-.01em">Partenariat validé</span><span style="font-size:12px;color:#4A5550">Fédération professionnelle</span></span></div>'
+      + '<div class="lc-pp2-rise lc-pp2-codezone" style="display:flex;flex-direction:column;gap:10px;padding:20px"><span class="lc-pp2-lib lc-pp2-codelib">Code à diffuser à vos adhérents</span>'
+      + '<div class="lc-pa-code"><span class="lc-pa-code-v">' + CODE + '</span><span class="lc-pa-copie" data-k2></span></div></div>'
+      + '<div class="lc-pp2-canaux" style="display:flex;flex-direction:column;gap:10px;padding:0 20px 20px;margin-top:auto">'
+      + ['Newsletter adhérents', 'Espace membres', 'Événements du réseau'].map(function (t) { return '<div class="lc-pp2-canal lc-pp2-rise">' + ic(16, CHK, '#007AA3', ' style="flex:none"') + t + '</div>'; }).join('')
+      + '</div></div>'
+      + '<div class="lc-pa-carte lc-pp2" data-e="2" hidden><div class="lc-pp2-tete"><span class="lc-pp2-titre">Projet d’un adhérent</span><span class="lc-pa-mono">ÉTAPE 3/3</span></div>'
+      + '<div class="lc-pp2-corps"><div class="lc-pp2-deux">' + champ('Montant') + champ('Durée') + '</div>'
+      + '<div class="lc-pp2-champ"><span class="lc-pp2-lib">Code partenaire</span><span class="lc-pp2-val" data-code style="font-family:' + MONO_A + ';letter-spacing:.06em;gap:1px"><span></span><span data-c3 style="width:1px;height:16px;background:#007AA3"></span></span></div>'
+      + '<div class="lc-pp2-reconnu lc-pp2-rise"><div><span style="display:flex;align-items:center;gap:8px;font-weight:500;color:#005A78">' + ic(14, CHK, '#007AA3', ' style="stroke-width:2"') + 'Code partenaire reconnu</span></div>'
+      + '<div><span>Commission de succès</span><span class="lc-pa-taux" style="font-size:12px"><span class="lc-pa-barre">1 %</span><span>0,8 %</span></span></div>'
+      + '<div><span>Premier contrat de sécurisation</span><span class="lc-pa-taux" style="font-size:12px">-10 %</span></div></div></div></div>';
+    var E = $$('.lc-pp2', box);
+    var f1 = $$('.lc-pp2-val', E[0]), v1 = ['Fédération professionnelle', 'Marchands de biens', '100 à 500'], b1 = E[0].querySelector('.lc-pp2-btn');
+    var ok2 = E[1].querySelector('.lc-pp2-rond'), zone2 = E[1].querySelector('.lc-pp2-codezone'), k2 = E[1].querySelector('[data-k2]'), canaux = $$('.lc-pp2-canal', E[1]);
+    var f3 = $$('.lc-pp2-deux .lc-pp2-val', E[2]), v3 = ['1,2 M€', '60 mois'], code3 = E[2].querySelector('[data-code]'), c3t = code3.firstChild, c3 = code3.querySelector('[data-c3]'), ok3 = E[2].querySelector('.lc-pp2-reconnu');
+    function monte(el, on) { el.style.opacity = on ? '1' : '0'; el.style.transform = on ? 'none' : 'translateY(8px)'; }
+    var s = -1, t = 0;
+    function rendu() {
+      function on(ms) { return t >= ms; }
+      E.forEach(function (e, k) { e.hidden = k !== s; });
+      if (s === 0) {
+        [300, 900, 1500].forEach(function (at, k) { txtSet(f1[k], on(at) ? v1[k] : ''); f1[k].style.borderColor = on(at) ? '#B8D8E6' : ''; });
+        txtSet(b1, on(3000) ? 'Demande envoyée ✓' : 'Envoyer la demande');
+        b1.style.background = on(2400) ? '#007AA3' : ''; b1.style.color = on(2400) ? '#fff' : '';
+      } else if (s === 1) {
+        ok2.style.transform = 'scale(' + (on(200) ? 1 : 0.4) + ')';
+        monte(zone2, on(800));
+        txtSet(k2, on(1800) ? 'Copié ✓' : 'Copier'); k2.style.color = on(1800) ? '#007AA3' : '';
+        [2400, 2900, 3400].forEach(function (at, k) { if (canaux[k]) monte(canaux[k], on(at)); });
+      } else if (s === 2) {
+        [200, 600].forEach(function (at, k) { txtSet(f3[k], on(at) ? v3[k] : ''); f3[k].style.borderColor = on(at) ? '#B8D8E6' : ''; });
+        var frappe = t >= 1100 && t < 2400;
+        txtSet(c3t, tape(CODE, 1300, 2200, t));
+        c3.style.opacity = frappe && t % 1000 < 600 ? '1' : '0';
+        code3.style.borderColor = frappe ? '#007AA3' : on(2200) ? '#B8D8E6' : '';
+        code3.style.boxShadow = frappe ? '0 0 0 3px rgba(0,122,163,.12)' : 'none';
+        monte(ok3, on(2700));
+      }
+    }
+    function actif() { var i = -1; etapes.forEach(function (e, k) { if (e.getAttribute('aria-expanded') === 'true') i = k; }); return i < 0 ? 0 : Math.min(i, E.length - 1); }
+    function suit() { var i = actif(); if (i !== s) { s = i; t = REDUCE ? 5500 : 0; } rendu(); }
+    if (etapes.length && 'MutationObserver' in window) {
+      var mo = new MutationObserver(suit);
+      etapes.forEach(function (e) { mo.observe(e, { attributes: true, attributeFilter: ['aria-expanded'] }); });
+    }
+    suit();
+    if (REDUCE) return;
+    var vu = false, survol = false, aplat = box.closest('.cv-aplat') || box;
+    visible(section, function (x) { vu = x; });
+    aplat.addEventListener('mouseenter', function () { survol = true; });
+    aplat.addEventListener('mouseleave', function () { survol = false; });
+    setInterval(function () { if (!vu || survol || t >= 5500) return; t += 100; rendu(); }, 100);
+  }
+
+  function partenaire() {
+    var h = $$('[data-lc-anim="part-hero"]'), pr = $$('[data-lc-anim="part-process"]');
+    if (!h.length && !pr.length) return;
+    var st = document.createElement('style'); st.textContent = partCss; document.head.appendChild(st);
+    h.forEach(partHero); pr.forEach(partProcess);
+  }
+
   /* ---------- Démarrage ---------- */
+  var stylesPoses = false;
+  function styles() {
+    if (stylesPoses) return;
+    stylesPoses = true;
+    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  }
   function init() {
-    var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+    styles();
+    var cal = document.querySelector('[data-lc-cal]'); if (cal) CAL = cal.getAttribute('data-lc-cal');
+    popupPartenaire();
+    comparateurs();
+    partenaire();
     dossiers();
     preteurs();
     preteur();
     calendriers();
     decorateLinks();
     /* Les déclencheurs s'ouvrent sur place : jamais dans un nouvel onglet. */
-    $$('a[href*="#lc-"], a[href*="#contact"], a[href*="/meetings/"]').forEach(function (a) { if (action(a)) a.removeAttribute('target'); });
+    $$('a[href*="#lc-"], a[href*="#contact"], a[href*="/meetings/"], .lc-site-footer a').forEach(function (a) { if (action(a)) a.removeAttribute('target'); });
     /* CTA d'inscription de la page : même onglet (le composant RDV partagé avec les LP impose _blank). */
     $$('a[href*="connect.covalt.eu"]').forEach(function (a) { a.removeAttribute('target'); });
 
@@ -829,16 +1039,17 @@
       if (!act) return;
       e.preventDefault(); e.stopPropagation();
       if (act === 'projet' || act === 'compte') ouvrirProfil(act);
+      else if (act === 'partenaire') ouvrir(part);
       else ouvrirRdv(act === 'meetings' ? a.href : CAL);
     }, true);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ouvert) fermer(); });
 
     /* Arrivée avec un hash (liens du footer depuis les autres pages Loan Connect). */
     var h = location.hash;
-    var auto = h === '#lc-profil-projet' ? 'projet' : h === '#lc-profil-compte' ? 'compte' : h === '#lc-rdv' ? 'rdv' : '';
+    var auto = h === '#lc-profil-projet' ? 'projet' : h === '#lc-profil-compte' ? 'compte' : h === '#lc-rdv' ? 'rdv' : h === '#lc-partenaire' && part ? 'partenaire' : '';
     if (auto) {
       history.replaceState(null, '', location.pathname + location.search);
-      if (auto === 'rdv') ouvrirRdv(CAL); else ouvrirProfil(auto);
+      if (auto === 'rdv') ouvrirRdv(CAL); else if (auto === 'partenaire') ouvrir(part); else ouvrirProfil(auto);
     }
 
     /* Cookie lc_attr posé par GTM après coup, ou consentement HubSpot donné ensuite. */
