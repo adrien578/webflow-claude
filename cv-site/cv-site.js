@@ -1104,7 +1104,7 @@
     }
     if (bascule) {
       bascule.setAttribute('aria-controls', liste.id || (liste.id = 'cv-ar-sommaire-liste'));
-      bascule.addEventListener('click', function () { if (mq.matches) ouvrir(box.classList.contains('cv-ar-ferme')); });
+      bascule.addEventListener('click', function (e) { e.preventDefault(); if (mq.matches) ouvrir(box.classList.contains('cv-ar-ferme')); });
     }
     function majMq() { ouvrir(!mq.matches); }
     if (mq.addEventListener) mq.addEventListener('change', majMq); else if (mq.addListener) mq.addListener(majMq);
@@ -1166,7 +1166,7 @@
       var it = a.closest('.w-dyn-item') || a, slug = (ds || a.getAttribute('href').replace(/\/$/, '').split('/').pop()).toLowerCase();
       var garde = slug !== cur && n < 3;
       if (garde) n++;
-      it.style.display = garde ? '' : 'none';
+      it.style.display = garde ? 'block' : 'none';
     });
   }
   function arJsonLd(sec, t) {
@@ -1196,8 +1196,7 @@
         var mots = (t.textContent.match(/[A-Za-zÀ-ÿ0-9’'-]+/g) || []).length;
         $$('[data-cv-ar-lecture]', sec).forEach(function (el) {
           txt($('[data-cv-ar-lecture-txt]', el) || el, Math.max(1, Math.round(mots / 230)) + ' min de lecture');
-          el.style.display = '';
-          el.removeAttribute('hidden');
+          el.style.display = 'flex';
         });
         arSommaire(sec, t);
       }
@@ -1208,6 +1207,11 @@
       }
       arPartage(sec);
       arJsonLd(sec, t);
+      // Fil d'Ariane : la catégorie renvoie à la liste filtrée (/blog?categorie={slug}).
+      $$('[data-cv-ar-cat]', sec).forEach(function (a) {
+        var c = (a.getAttribute('data-cv-ar-cat') || '').trim();
+        if (c) a.setAttribute('href', '/blog?categorie=' + encodeURIComponent(c));
+      });
     });
     $$('[data-cv-ar-similaires]').forEach(arSimilaires);
   }
