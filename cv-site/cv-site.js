@@ -1012,6 +1012,20 @@
      (sans JS : tout est visible, bouton masqué). ?categorie={slug} présélectionne la puce et descend à #articles.
      Liens « article courant » des listes CMS (href « /blog ») : /blog/{data-cv-slug}. */
   var BLOG_PAS = 12;
+  /* Puces en ligne défilante (mobile) : bouton flèche à droite tant qu'il reste des puces à voir ; un clic avance de 70 %. */
+  function blogFleche(puces) {
+    if (!puces || puces.parentNode.classList.contains('cv-bl-puces-cadre')) return;
+    var cadre = document.createElement('div'), f = document.createElement('button');
+    cadre.className = 'cv-bl-puces-cadre';
+    puces.parentNode.insertBefore(cadre, puces); cadre.appendChild(puces);
+    f.type = 'button'; f.className = 'cv-bl-fleche'; f.setAttribute('aria-label', 'Voir les autres catégories'); f.tabIndex = -1;
+    f.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+    cadre.appendChild(f);
+    function maj() { cadre.classList.toggle('cv-bl-suite', puces.scrollWidth - puces.clientWidth - puces.scrollLeft > 8); }
+    f.addEventListener('click', function () { puces.scrollBy({ left: puces.clientWidth * 0.7, behavior: REDUCE ? 'auto' : 'smooth' }); });
+    puces.addEventListener('scroll', maj, { passive: true }); addEventListener('resize', maj); addEventListener('load', maj); maj();
+    if (window.ResizeObserver) new ResizeObserver(maj).observe(puces);
+  }
   function lienArticle(a) {
     var ds = (a.getAttribute('data-cv-slug') || '').trim();
     if (ds && !/\/blog\/[^#?]/.test(a.getAttribute('href') || '')) a.setAttribute('href', '/blog/' + ds);
@@ -1034,6 +1048,7 @@
         lignes().some(function (l) { if (iso(l) < d) { apres = l.closest('.w-dyn-item') || l; return true; } return false; });
         if (apres) apres.parentNode.insertBefore(it, apres); else if (listes.length) listes[listes.length - 1].appendChild(it);
       });
+      blogFleche($('.cv-gl-puces', sec));
       var plus = $('[data-cv-blog-plus]', sec), n = BLOG_PAS;
       var items = lignes().map(function (a) {
         var it = a.closest('.w-dyn-item') || a, t = $('.cv-bl-titre', a), r = $('.cv-bl-resume', a), au = $('.cv-bl-auteur', a);
@@ -1128,7 +1143,13 @@
       + '.cv-ar-toc-h3.cv-ar-toc-on{color:#24826B;font-weight:500}'
       + '.cv-ar-toc-h2:focus-visible,.cv-ar-toc-h3:focus-visible{outline:2px solid #24826B;outline-offset:2px}'
       + '[data-cv-ar-barre]{transition:width 150ms linear}'
-      + '@media (max-width:991px){[data-cv-ar-sommaire].cv-ar-ferme .cv-ar-toc-liste{display:none}}'
+      + '@media (max-width:991px){[data-cv-ar-sommaire].cv-ar-ferme .cv-ar-toc-liste{display:none}'
+      // Mobile et tablette : le sommaire replié reste collé sous le header pendant la lecture.
+      + '.cv-ar-corps-in{display:block}.cv-ar-aside{position:sticky;top:var(--cv-hd,0px);z-index:20;margin:0 -24px 32px}'
+      + '.cv-ar-toc{gap:8px;padding:10px 24px;border-radius:0;border-left:0;border-right:0;box-shadow:0 6px 16px -12px rgba(8,20,18,.35)}'
+      + '.cv-ar-toc:not(.cv-ar-ferme) .cv-ar-toc-liste{max-height:calc(100vh - var(--cv-hd,0px) - 120px);max-height:calc(100dvh - var(--cv-hd,0px) - 120px);overflow:auto;overscroll-behavior:contain}}'
+      // Mobile : texte justifié (titres exclus).
+      + '@media (max-width:767px){.cv-ar-texte p,.cv-ar-texte li,.cv-ar-encart p{text-align:justify;-webkit-hyphens:auto;hyphens:auto}}'
       + '@media (prefers-reduced-motion:reduce){.cv-ar-toc-pli,.cv-ar-toc-sous li{transition:none}}';
     document.head.appendChild(s);
   }
@@ -1200,7 +1221,7 @@
     function majMq() { ouvrir(!mq.matches); }
     if (mq.addEventListener) mq.addEventListener('change', majMq); else if (mq.addListener) mq.addListener(majMq);
     majMq();
-    function haut() { var nav = $('.navbar'), b = nav ? nav.getBoundingClientRect().bottom : 0; return Math.max(0, b); }
+    function haut() { var nav = $('.navbar'), b = nav ? nav.getBoundingClientRect().bottom : 0; return Math.max(0, b) + (mq.matches ? box.offsetHeight : 0); }
     function maj() {
       var a = -1, a3 = null, r = t.getBoundingClientRect(), vh = window.innerHeight, seuil = Math.max(140, haut() + 40);
       items.forEach(function (it, k) { if (it.h.getBoundingClientRect().top < seuil) a = k; });
