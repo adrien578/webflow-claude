@@ -592,7 +592,7 @@
     function maj() {
       attente = false;
       var r = nav.getBoundingClientRect(), m = parseFloat(getComputedStyle(document.body).marginTop) || 0;
-      var bas = Math.round(Math.max(0, r.bottom)) + 'px';
+      var bas = Math.floor(Math.max(0, r.bottom)) + 'px';
       if (bas !== dernier) { root.style.setProperty('--cv-hd', bas); dernier = bas; }
       root.style.setProperty('--cv-hd-pad', Math.max(0, Math.round(r.height) - m) + 'px');
     }
