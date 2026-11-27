@@ -1,0 +1,26 @@
+html{scroll-behavior:smooth}
+.cv-ar-hero{padding-top:var(--cv-hd-pad,53px)}
+@media (max-width:991px){.cv-ar-hero{padding-top:var(--cv-hd-pad,72px)}}
+@media (max-width:479px){.cv-ar-hero{padding-top:var(--cv-hd-pad,122px)}}
+@media (min-width:992px){.cv-ar-aside{top:calc(var(--cv-hd,73px) + 24px);max-height:calc(100vh - var(--cv-hd,73px) - 48px)}}
+.cv-ar-h1{text-wrap:balance}
+.cv-ar-visuel:has(img.w-dyn-bind-empty){display:none}
+.cv-gd-ariane-lien:hover{color:#24826B}
+.cv-gd-bouton,.cv-gd-bouton-contour{transition:background-color 200ms,border-color 200ms}
+.cv-gd-bouton:hover{background-color:#1E6E5A;color:#fff}
+.cv-gd-bouton-contour:hover{border-color:#fff;color:#fff}
+.cv-gd-lien-fleche:hover{color:#18594A}
+.cv-ar-btn-carre,.cv-ar-btn-copier{transition:border-color 200ms,color 200ms}
+.cv-ar-btn-carre:hover,.cv-ar-btn-copier:hover{border-color:#24826B;color:#24826B}
+.cv-ar-btn-carre svg,.cv-ar-btn-copier svg,.cv-ar-icone svg{display:block}
+.cv-ar-toc-btn svg{transition:transform 350ms cubic-bezier(.2,.8,.2,1)}
+.cv-ar-toc-tete{text-decoration:none}
+.cv-ar-carte{transition:border-color 250ms,transform 250ms}
+.cv-ar-carte:hover{border-color:#24826B;transform:translateY(-2px);color:#081412}
+[data-cv-ar-similaires] .w-dyn-item:nth-child(n+4){display:none}
+.cv-ar-encart-titre.w-dyn-bind-empty,.cv-ar-encart-texte.w-dyn-bind-empty{display:none}
+.cv-ar-encart-titre:not(.w-dyn-bind-empty)+.cv-ar-defaut,.cv-ar-encart-texte:not(.w-dyn-bind-empty)+.cv-ar-defaut{display:none}
+.cv-ar-interv:has(.cv-ar-interv-texte.w-dyn-bind-empty){display:none}
+.cv-ar-interv-img.w-dyn-bind-empty{display:none}
+.cv-gd-bouton:focus-visible,.cv-gd-bouton-contour:focus-visible,.cv-ar-btn-carre:focus-visible,.cv-ar-btn-copier:focus-visible,.cv-ar-toc-tete:focus-visible,.cv-ar-carte:focus-visible,.cv-gd-ariane-lien:focus-visible,.cv-gd-lien-fleche:focus-visible,.cv-ar-texte a:focus-visible{outline:2px solid #24826B;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cv-ar-carte,.cv-ar-carte:hover{transition:none;transform:none}.cv-ar-toc-btn svg{transition:none}}

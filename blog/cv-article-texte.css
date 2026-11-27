@@ -1,5 +1,5 @@
 .cv-ar-texte{color:#2B3533;font-size:18px;line-height:1.72}
-.cv-ar-texte>*:first-child{margin-top:0;padding-top:0;border-top:0}
+.cv-ar-texte .w-richtext>*:first-child{margin-top:0;padding-top:0;border-top:0}
 .cv-ar-texte p{font-size:18px;line-height:1.72;color:#2B3533;margin:0 0 22px;text-wrap:pretty}
 .cv-ar-texte h1,.cv-ar-texte h2{font-family:"Gerstner Programm",Tahoma,sans-serif;font-weight:400;font-size:clamp(26px,2.6vw,34px);line-height:1.15;letter-spacing:-.02em;color:#081412;margin:56px 0 20px;padding-top:32px;border-top:1px solid #DCE2DF;scroll-margin-top:96px;text-wrap:balance}
 .cv-ar-texte h3{font-family:"Gerstner Programm",Tahoma,sans-serif;font-weight:400;font-size:22px;line-height:1.25;letter-spacing:-.01em;color:#081412;margin:36px 0 14px;scroll-margin-top:96px}
@@ -7,7 +7,7 @@
 .cv-ar-texte strong{font-weight:600;color:#081412}
 .cv-ar-texte h1 strong,.cv-ar-texte h2 strong,.cv-ar-texte h3 strong{font-weight:inherit}
 .cv-ar-texte a{color:#24826B;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-.cv-ar-texte a:hover{color:#1E6E5A}
+.cv-ar-texte a:hover{color:#1E6E5A}.cv-ar-texte a strong,.cv-ar-texte a b{color:inherit}
 .cv-ar-texte ul,.cv-ar-texte ol{margin:0 0 26px;padding:0;display:flex;flex-direction:column;gap:12px}
 .cv-ar-texte ul{list-style:none}
 .cv-ar-texte ol{list-style:none;counter-reset:cvol}
