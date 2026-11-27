@@ -1014,8 +1014,12 @@
       var lignes = function () { return $$('[data-cv-article]', sec).filter(function (a) { return !a.closest('[data-cv-blog-une-src]'); }); };
       var iso = function (a) { var d = $('[data-cv-date]', a); return d ? d.getAttribute('data-cv-iso') || '' : ''; };
       // Articles à la une : replacés à leur date (liste triée du plus récent au plus ancien).
+      // Si une liste principale contient déjà l'article (filtre « À la une » absent), la ligne existante est marquée « une ».
+      var slug = function (a) { return (a.getAttribute('data-cv-slug') || '').trim(); };
       $$('[data-cv-blog-une-src] [data-cv-article]', sec).forEach(function (a) {
         var it = a.closest('.w-dyn-item') || a, d = iso(a), apres = null;
+        var deja = lignes().filter(function (l) { return slug(l) && slug(l) === slug(a); })[0];
+        if (deja) { (deja.closest('.w-dyn-item') || deja).setAttribute('data-cv-une', ''); it.parentNode.removeChild(it); return; }
         it.setAttribute('data-cv-une', '');
         lignes().some(function (l) { if (iso(l) < d) { apres = l.closest('.w-dyn-item') || l; return true; } return false; });
         if (apres) apres.parentNode.insertBefore(it, apres); else if (listes.length) listes[listes.length - 1].appendChild(it);
