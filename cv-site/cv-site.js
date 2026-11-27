@@ -942,7 +942,7 @@
   }
   /* Filtres communs (guides, blog) : puces [o.puce] (correspondance exacte, vide = Tous) avec compteur .cv-gl-puce-n calculé
      sur tous les éléments, à la une compris ; recherche [o.champ] sans casse ni accents à chaque frappe, combinée à la puce ;
-     titre [o.titre] (o.tous / o.un / « N » + o.plusieurs) ; état vide [o.vide] (classe cv-gl-vide-on) ; [o.reset] remet tout à zéro.
+     titre [o.titre] (o.tous, « 0 » ou « 1 » + o.un, « N » + o.plusieurs) ; état vide [o.vide] (classe cv-gl-vide-on) ; [o.reset] remet tout à zéro.
      Les éléments « une » ne sont montrés que si un filtre ou une recherche est actif. o.montrer(visibles, actif) remplace l'affichage
      par défaut (display block) ; o.sansVides masque les puces à 0. Renvoie { choisir(cle), rendu() }. */
   function filtres(sec, o) {
@@ -956,7 +956,7 @@
       });
       if (o.montrer) o.montrer(vis, actif); else vis.forEach(function (c) { c.el.style.display = 'block'; });
       puces.forEach(function (p) { p.setAttribute('aria-pressed', (p.getAttribute(o.puce) || '') === cle ? 'true' : 'false'); });
-      txt(titre, !actif ? o.tous : vis.length === 1 ? o.un : vis.length + ' ' + o.plusieurs);
+      txt(titre, !actif ? o.tous : vis.length < 2 ? vis.length + ' ' + o.un : vis.length + ' ' + o.plusieurs);
       if (vide) vide.classList.toggle('cv-gl-vide-on', vis.length === 0);
     }
     puces.forEach(function (p) {
@@ -981,7 +981,7 @@
     anims('guides').forEach(function (sec) {
       filtres(sec, {
         puce: 'data-cv-guides-theme', champ: 'data-cv-guides-search', titre: 'data-cv-guides-titre', vide: 'data-cv-guides-vide',
-        reset: 'data-cv-guides-reset', tous: 'Tous nos guides', un: '1 guide', plusieurs: 'guides',
+        reset: 'data-cv-guides-reset', tous: 'Tous nos guides', un: 'guide', plusieurs: 'guides',
         items: $$('[data-cv-guide]', sec).map(function (c) {
           var nom = $('.cv-gl-carte-nom', c), desc = $('.cv-gl-carte-desc', c), ds = (c.getAttribute('data-cv-slug') || '').trim();
           if (ds && !/\/guide\/[^#?]/.test(c.getAttribute('href') || '')) c.setAttribute('href', '/guide/' + ds);
@@ -1034,7 +1034,7 @@
       });
       var f = filtres(sec, {
         puce: 'data-cv-blog-categorie', champ: 'data-cv-blog-recherche', titre: 'data-cv-blog-titre', vide: 'data-cv-blog-vide',
-        reset: 'data-cv-blog-reset', tous: 'Tous nos articles', un: '1 article', plusieurs: 'articles', items: items, sansVides: true,
+        reset: 'data-cv-blog-reset', tous: 'Tous nos articles', un: 'article', plusieurs: 'articles', items: items, sansVides: true,
         montrer: function (vis, actif) {
           vis.forEach(function (c, i) { c.el.style.display = actif || i < n ? 'block' : 'none'; });
           if (plus) plus.style.display = !actif && vis.length > n ? 'inline-flex' : 'none';
