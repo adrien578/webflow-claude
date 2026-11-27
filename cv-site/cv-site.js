@@ -2,7 +2,7 @@
  * Chaque bloc s'active via data-cv-anim : reveal, marquee, faq, rdv, comparateur, process, depot-projet.
  * Témoignages : chaque section .cv-tq (CV Témoignages) est initialisée seule.
  * Guides pratiques : guide (modèle /guide/…), guide-logos, guides (page liste : filtres, recherche).
- * Blog : article (modèle /blog/…) ; dates en français sur [data-cv-date].
+ * Blog : article (modèle /blog/…), blog (page liste : filtres, recherche, charger plus) ; dates en français sur [data-cv-date].
  * Sans JS ou avec prefers-reduced-motion, la page garde l'état final statique livré par Webflow.
  */
 (function () {
@@ -940,66 +940,143 @@
     if (s.normalize) s = s.normalize('NFD').replace(/[̀-ͯ]/g, '');
     return s.toLowerCase().replace(/[’']/g, ' ').replace(/\s+/g, ' ').trim();
   }
+  /* Filtres communs (guides, blog) : puces [o.puce] (correspondance exacte, vide = Tous) avec compteur .cv-gl-puce-n calculé
+     sur tous les éléments, à la une compris ; recherche [o.champ] sans casse ni accents à chaque frappe, combinée à la puce ;
+     titre [o.titre] (o.tous / o.un / « N » + o.plusieurs) ; état vide [o.vide] (classe cv-gl-vide-on) ; [o.reset] remet tout à zéro.
+     Les éléments « une » ne sont montrés que si un filtre ou une recherche est actif. o.montrer(visibles, actif) remplace l'affichage
+     par défaut (display block) ; o.sansVides masque les puces à 0. Renvoie { choisir(cle), rendu() }. */
+  function filtres(sec, o) {
+    var puces = $$('[' + o.puce + ']', sec), champ = $('[' + o.champ + ']', sec), titre = $('[' + o.titre + ']', sec);
+    var vide = $('[' + o.vide + ']', sec), items = o.items, cle = '', q = '';
+    function rendu() {
+      var actif = !!(cle || q), vis = [];
+      items.forEach(function (c) {
+        var ok = (!cle || c.cle === cle) && (!q || c.txt.indexOf(q) >= 0) && (actif || !c.une);
+        if (ok) vis.push(c); else c.el.style.display = 'none';
+      });
+      if (o.montrer) o.montrer(vis, actif); else vis.forEach(function (c) { c.el.style.display = 'block'; });
+      puces.forEach(function (p) { p.setAttribute('aria-pressed', (p.getAttribute(o.puce) || '') === cle ? 'true' : 'false'); });
+      txt(titre, !actif ? o.tous : vis.length === 1 ? o.un : vis.length + ' ' + o.plusieurs);
+      if (vide) vide.classList.toggle('cv-gl-vide-on', vis.length === 0);
+    }
+    puces.forEach(function (p) {
+      var t = p.getAttribute(o.puce) || '', n = t ? items.filter(function (c) { return c.cle === t; }).length : items.length;
+      txt($('.cv-gl-puce-n', p), String(n));
+      if (o.sansVides && t && !n) p.style.display = 'none';
+      p.addEventListener('click', function () { cle = t; rendu(); });
+    });
+    if (champ) champ.addEventListener('input', function () { q = norm(champ.value); rendu(); });
+    $$('[' + o.reset + ']', sec).forEach(function (b) {
+      b.addEventListener('click', function () { cle = ''; q = ''; if (champ) champ.value = ''; rendu(); });
+    });
+    rendu();
+    return {
+      choisir: function (t) {
+        if (!puces.some(function (p) { return (p.getAttribute(o.puce) || '') === t && p.style.display !== 'none'; })) return false;
+        cle = t; rendu(); return true;
+      }, rendu: rendu
+    };
+  }
   function guides() {
     anims('guides').forEach(function (sec) {
-      var puces = $$('[data-cv-guides-theme]', sec), champ = $('[data-cv-guides-search]', sec);
-      var titre = $('[data-cv-guides-titre]', sec), vide = $('[data-cv-guides-vide]', sec), theme = '', q = '';
-      var cartes = $$('[data-cv-guide]', sec).map(function (c) {
-        var nom = $('.cv-gl-carte-nom', c), desc = $('.cv-gl-carte-desc', c), ds = (c.getAttribute('data-cv-slug') || '').trim();
-        if (ds && !/\/guide\/[^#?]/.test(c.getAttribute('href') || '')) c.setAttribute('href', '/guide/' + ds);
-        return {
-          el: c.closest('.w-dyn-item') || c, theme: (c.getAttribute('data-cv-theme') || '').trim(),
-          txt: norm((nom ? nom.textContent : '') + ' ' + (desc ? desc.textContent : '')), une: !!c.closest('[data-cv-guides-une]')
-        };
+      filtres(sec, {
+        puce: 'data-cv-guides-theme', champ: 'data-cv-guides-search', titre: 'data-cv-guides-titre', vide: 'data-cv-guides-vide',
+        reset: 'data-cv-guides-reset', tous: 'Tous nos guides', un: '1 guide', plusieurs: 'guides',
+        items: $$('[data-cv-guide]', sec).map(function (c) {
+          var nom = $('.cv-gl-carte-nom', c), desc = $('.cv-gl-carte-desc', c), ds = (c.getAttribute('data-cv-slug') || '').trim();
+          if (ds && !/\/guide\/[^#?]/.test(c.getAttribute('href') || '')) c.setAttribute('href', '/guide/' + ds);
+          return {
+            el: c.closest('.w-dyn-item') || c, cle: (c.getAttribute('data-cv-theme') || '').trim(),
+            txt: norm((nom ? nom.textContent : '') + ' ' + (desc ? desc.textContent : '')), une: !!c.closest('[data-cv-guides-une]')
+          };
+        })
       });
-      function rendu() {
-        var actif = !!(theme || q), n = 0;
-        cartes.forEach(function (c) {
-          var ok = (!theme || c.theme === theme) && (!q || c.txt.indexOf(q) >= 0) && (actif || !c.une);
-          c.el.style.display = ok ? 'block' : 'none';
-          if (ok) n++;
-        });
-        puces.forEach(function (p) { p.setAttribute('aria-pressed', p.getAttribute('data-cv-guides-theme') === theme ? 'true' : 'false'); });
-        txt(titre, !actif ? 'Tous nos guides' : n === 1 ? '1 guide' : n + ' guides');
-        if (vide) vide.classList.toggle('cv-gl-vide-on', n === 0);
-      }
-      puces.forEach(function (p) {
-        var t = p.getAttribute('data-cv-guides-theme') || '';
-        txt($('.cv-gl-puce-n', p), String(t ? cartes.filter(function (c) { return c.theme === t; }).length : cartes.length));
-        p.addEventListener('click', function () { theme = t; rendu(); });
-      });
-      if (champ) champ.addEventListener('input', function () { q = norm(champ.value); rendu(); });
-      $$('[data-cv-guides-reset]', sec).forEach(function (b) {
-        b.addEventListener('click', function () { theme = ''; q = ''; if (champ) champ.value = ''; rendu(); });
-      });
-      rendu();
     });
   }
 
+  /* blog (page liste, section data-cv-anim="blog") : filtres communs (puces [data-cv-blog-categorie] = slug de catégorie,
+     recherche [data-cv-blog-recherche] sur titre, résumé et auteur, titre [data-cv-blog-titre], vide [data-cv-blog-vide],
+     [data-cv-blog-reset]) ; lignes [data-cv-article] (data-cv-categorie, data-cv-slug). Les listes principales n'ont pas les
+     articles à la une ; ceux-ci sont dans une liste masquée [data-cv-blog-une-src] : le script les replace à leur date dans la
+     liste et ne les montre que si un filtre ou une recherche est actif (sans JS : aucun doublon). Puces à 0 masquées.
+     « Charger plus » [data-cv-blog-plus] : 12 lignes, puis 12 de plus ; masqué quand tout est affiché ou si un filtre est actif
+     (sans JS : tout est visible, bouton masqué). ?categorie={slug} présélectionne la puce et descend à #articles.
+     Liens « article courant » des listes CMS (href « /blog ») : /blog/{data-cv-slug}. */
+  var BLOG_PAS = 12;
+  function lienArticle(a) {
+    var ds = (a.getAttribute('data-cv-slug') || '').trim();
+    if (ds && !/\/blog\/[^#?]/.test(a.getAttribute('href') || '')) a.setAttribute('href', '/blog/' + ds);
+  }
+  function blog() {
+    anims('blog').forEach(function (sec) {
+      $$('a[data-cv-slug]').forEach(lienArticle);
+      var listes = $$('.w-dyn-items', sec).filter(function (l) { return !l.closest('[data-cv-blog-une-src]'); });
+      var lignes = function () { return $$('[data-cv-article]', sec).filter(function (a) { return !a.closest('[data-cv-blog-une-src]'); }); };
+      var iso = function (a) { var d = $('[data-cv-date]', a); return d ? d.getAttribute('data-cv-iso') || '' : ''; };
+      // Articles à la une : replacés à leur date (liste triée du plus récent au plus ancien).
+      $$('[data-cv-blog-une-src] [data-cv-article]', sec).forEach(function (a) {
+        var it = a.closest('.w-dyn-item') || a, d = iso(a), apres = null;
+        it.setAttribute('data-cv-une', '');
+        lignes().some(function (l) { if (iso(l) < d) { apres = l.closest('.w-dyn-item') || l; return true; } return false; });
+        if (apres) apres.parentNode.insertBefore(it, apres); else if (listes.length) listes[listes.length - 1].appendChild(it);
+      });
+      var plus = $('[data-cv-blog-plus]', sec), n = BLOG_PAS;
+      var items = lignes().map(function (a) {
+        var it = a.closest('.w-dyn-item') || a, t = $('.cv-bl-titre', a), r = $('.cv-bl-resume', a), au = $('.cv-bl-auteur', a);
+        return {
+          el: it, cle: (a.getAttribute('data-cv-categorie') || '').trim(), une: it.hasAttribute('data-cv-une'),
+          txt: norm([t, r, au].map(function (x) { return x ? x.textContent : ''; }).join(' '))
+        };
+      });
+      var f = filtres(sec, {
+        puce: 'data-cv-blog-categorie', champ: 'data-cv-blog-recherche', titre: 'data-cv-blog-titre', vide: 'data-cv-blog-vide',
+        reset: 'data-cv-blog-reset', tous: 'Tous nos articles', un: '1 article', plusieurs: 'articles', items: items, sansVides: true,
+        montrer: function (vis, actif) {
+          vis.forEach(function (c, i) { c.el.style.display = actif || i < n ? 'block' : 'none'; });
+          if (plus) plus.style.display = !actif && vis.length > n ? 'inline-flex' : 'none';
+        }
+      });
+      if (plus) plus.addEventListener('click', function () {
+        var avant = n; n += BLOG_PAS; f.rendu();
+        var cible = items.filter(function (c) { return !c.une; })[avant];
+        var l = cible && $('a', cible.el); if (l) l.focus({ preventScroll: true });
+      });
+      var m = location.search.match(/[?&]categorie=([^&#]+)/);
+      if (m && f.choisir(decodeURIComponent(m[1]).toLowerCase())) {
+        setTimeout(function () {
+          var nav = $('.navbar'), h = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
+          window.scrollTo({ top: Math.max(0, sec.getBoundingClientRect().top + window.pageYOffset - h), behavior: 'auto' });
+        }, 0);
+      }
+    });
+  }
 
   /* Dates en français : tout élément [data-cv-date] (date CMS au format Webflow, ex. « January 8, 2026 » ou ISO)
      devient « 8 janvier 2026 » (« 1er » pour le premier du mois). Sans JS : format de Webflow. */
   var MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   var MOIS_EN = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-  function dateFr(s) {
+  function dateParts(s) {
     s = String(s || '').trim();
     var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/), j, mo, a;
     if (m) { a = +m[1]; mo = +m[2] - 1; j = +m[3]; }
     else {
       m = s.match(/([A-Za-zéû]+)\.?\s+(\d{1,2}),?\s+(\d{4})/) || s.match(/(\d{1,2})\s+([A-Za-zéû]+)\.?\s+(\d{4})/);
-      if (!m) return '';
+      if (!m) return null;
       var nom = isNaN(+m[1]) ? m[1] : m[2]; j = +(isNaN(+m[1]) ? m[2] : m[1]); a = +m[3];
       mo = MOIS_EN.indexOf(nom.slice(0, 3).toLowerCase());
       if (mo < 0) mo = MOIS.map(function (x) { return norm(x).slice(0, 3); }).indexOf(norm(nom).slice(0, 3));
-      if (mo < 0) return '';
+      if (mo < 0) return null;
     }
-    return (j === 1 ? '1er' : j) + ' ' + MOIS[mo] + ' ' + a;
+    return { j: j, mo: mo, a: a };
   }
+  function dateFr(s) { var d = dateParts(s); return d ? (d.j === 1 ? '1er' : d.j) + ' ' + MOIS[d.mo] + ' ' + d.a : ''; }
   function dates() {
     $$('[data-cv-date]').forEach(function (el) {
       if (el.getAttribute('data-cv-date-ok')) return;
-      var d = dateFr(el.getAttribute('datetime') || el.textContent);
-      if (d) { txt(el, d); el.setAttribute('data-cv-date-ok', ''); }
+      var p = dateParts(el.getAttribute('datetime') || el.textContent);
+      if (!p) return;
+      el.setAttribute('data-cv-iso', p.a + '-' + (p.mo < 9 ? '0' : '') + (p.mo + 1) + '-' + (p.j < 10 ? '0' : '') + p.j);
+      txt(el, (p.j === 1 ? '1er' : p.j) + ' ' + MOIS[p.mo] + ' ' + p.a); el.setAttribute('data-cv-date-ok', '');
     });
   }
 
@@ -1217,6 +1294,6 @@
     $$('[data-cv-ar-similaires]').forEach(arSimilaires);
   }
 
-  function init() { dates(); article(); guide(); guides(); reveal(); marquee(); faq(); rdv(); comparateur(); process(); depot(); temoignages(); }
+  function init() { dates(); article(); guide(); guides(); blog(); reveal(); marquee(); faq(); rdv(); comparateur(); process(); depot(); temoignages(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
