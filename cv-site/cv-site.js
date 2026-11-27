@@ -581,16 +581,25 @@
   // (« If typologie contains any of … then show Statut fiduciaire »). Valeurs de la liste « typologie ».
   var FIDU_TYPES = ['Avocat', 'Groupe bancaire', 'Banque indépendante', 'Fonds de dette', 'Fonds Private Equity', 'Family office'];
   function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
+  var hdPret = false;
   function headerOffset() {
     var nav = $('.navbar'), root = document.documentElement;
-    if (!nav) return;
+    if (!nav || hdPret) return;
+    hdPret = true;
+    // --cv-hd = bas visible du header (le bandeau peut se replier ou le header glisser au défilement, notamment sur iPhone) :
+    // les barres collées (filtres) se calent toujours juste dessous, sans trou ni chevauchement.
+    var dernier = '', attente = false;
     function maj() {
-      var h = Math.round(nav.getBoundingClientRect().height), m = parseFloat(getComputedStyle(document.body).marginTop) || 0;
-      root.style.setProperty('--cv-hd', h + 'px');
-      root.style.setProperty('--cv-hd-pad', Math.max(0, h - m) + 'px');
+      attente = false;
+      var r = nav.getBoundingClientRect(), m = parseFloat(getComputedStyle(document.body).marginTop) || 0;
+      var bas = Math.round(Math.max(0, r.bottom)) + 'px';
+      if (bas !== dernier) { root.style.setProperty('--cv-hd', bas); dernier = bas; }
+      root.style.setProperty('--cv-hd-pad', Math.max(0, Math.round(r.height) - m) + 'px');
     }
-    maj(); addEventListener('resize', maj); addEventListener('load', maj);
-    if (window.ResizeObserver) new ResizeObserver(maj).observe(nav);
+    function planifie() { if (!attente) { attente = true; requestAnimationFrame(maj); } }
+    maj(); addEventListener('resize', planifie); addEventListener('load', maj);
+    addEventListener('scroll', planifie, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(planifie).observe(nav);
   }
   function guideForm(root) {
     var id = (root.getAttribute('data-cv-hs-form') || '').trim(), form = $('form', root), ok = $('.cv-gd-succes', root);
@@ -1009,6 +1018,7 @@
   }
   function blog() {
     anims('blog').forEach(function (sec) {
+      headerOffset();
       $$('a[data-cv-slug]').forEach(lienArticle);
       var listes = $$('.w-dyn-items', sec).filter(function (l) { return !l.closest('[data-cv-blog-une-src]'); });
       var lignes = function () { return $$('[data-cv-article]', sec).filter(function (a) { return !a.closest('[data-cv-blog-une-src]'); }); };
